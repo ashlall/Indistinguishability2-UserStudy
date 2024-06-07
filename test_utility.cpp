@@ -1,6 +1,7 @@
 // this file includes unit tests for functions written in utility.cpp
 
 #include "utility.cpp"
+#include <cassert>
 
 // helper function to create a point
 point_t* create_point(double x, double y) {
