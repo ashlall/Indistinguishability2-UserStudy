@@ -1,6 +1,7 @@
 // this file includes unit tests for functions written in utility.cpp
 
 #include "utility.cpp"
+#include <cassert>
 
 // helper function to create a point
 point_t* create_point(double x, double y) {
@@ -39,6 +40,11 @@ void test_min_slope() {
     }
 
     cout << "Finished testing" << endl;
+}
+
+void test_display_points(){
+    //display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations);
+
 }
 
 int main() {
