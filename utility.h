@@ -4,7 +4,9 @@
 #include "data_struct.h"
 #include "data_utility.h"
 
+#include <algorithm> 
 #include <cmath>
+#include <cassert>
 
 #define SLOPE_TYPE          double
 
