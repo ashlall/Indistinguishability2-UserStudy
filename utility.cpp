@@ -60,7 +60,7 @@ SLOPE_TYPE display_points(point_set_t* P, int s, double alpha, double beta, int 
         
         point1 = P -> points[rand_index1];                  // should be accessing point_t*
         point2 = P -> points[rand_index2];
-        current_slope = compute_slope(point1, p2);          // find slope of pair
+        current_slope = compute_slope(point1, point2);          // find slope of pair
 
         current_point_pair -> pair[0] = point1;               // Save object's attributes
         current_point_pair -> pair[1] = point2;
@@ -68,21 +68,14 @@ SLOPE_TYPE display_points(point_set_t* P, int s, double alpha, double beta, int 
 
         // if slope is within bounds, add point pair to SS and increment numberOfPairs
         if (current_slope >= alpha && current_slope <= beta){
-            SS -> point_pairs[numberOfPoints] = current_point_pair;
+            SS -> point_pairs[SS -> numberOfPairs] = current_point_pair;
             SS -> numberOfPairs += 1;
         }
 
     // find median slope (generalize for other S in the future)
     int median_index = (SS -> numberOfPairs) / 2;
-    median_slope = SS -> point_pairs[median_index];
+    median_slope = SS -> point_pairs[median_index] -> slope;
     //RETURN PAIR THAT MAKES MEDIAN SLOPE INSEAD!!!!!
     return median_slope; // return median_slope or SS? add median to SS as an instance variable?
     }
-}
-
-
-
-
-
-
 }
