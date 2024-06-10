@@ -99,12 +99,6 @@ void test_min_slope() {
 
 void test_display_points(){
     //display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations);
-
-}
-
-void test_display_points(){
-    //display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations);
-
 }
 
 int main() {
