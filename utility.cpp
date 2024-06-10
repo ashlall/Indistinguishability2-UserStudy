@@ -121,6 +121,7 @@ point_pair_t display_points(point_set_t* P, int s, double alpha, double beta, in
     }
     
     // find median slope (generalize for other S in the future)
+    // NEED TO SORT
     int median_index = (s_hat -> numberOfPairs) / 2;
     median_slope_pair = s_hat -> point_pairs[median_index];
 
