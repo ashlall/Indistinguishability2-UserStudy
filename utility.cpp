@@ -39,6 +39,18 @@ SLOPE_TYPE min_slope(point_set_t* P) {
     return min_slope;
 }
 
+int count_slopes(point_set_t* P, double alpha, double beta) {
+    int num_slopes;
+    SLOPE_TYPE y_at_alpha;
+
+    // compute y values at x = alpha for all point-line
+    for (int i = 0; i < P->numberOfPoints; i++) {
+        point_t *currentPoint = P->points[i];
+        y_at_alpha = currentPoint -> coord[0] * alpha - currentPoint->coord[1];
+    }
+    return num_slopes;
+}
+
 // randomly select set of points and compute their slopes
 // check if their slopes are in the range of alpha and beta, add to s_hat if so
 SLOPE_TYPE display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations){
