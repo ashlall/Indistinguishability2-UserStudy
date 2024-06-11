@@ -11,4 +11,4 @@ utility:
 	g++ -w utility.cpp test_utility.cpp -lglpk -lm -Ofast -o run_utility
 
 clean:
-	rm run
+	rm run run_utility

@@ -24,12 +24,19 @@ typedef struct s_point_set
 	point_pair_t **point_pairs;
 }	s_point_set_t;
 
+// helper data structure for count_slopes
+typedef struct point_order
+{
+    point_t *point;
+    // order when sort y values at x = alpha
+    int order;
+}   point_order_t;
+
 using namespace std;
 
-// compute min slope 
 SLOPE_TYPE              compute_slope           (point_t* p1, point_t* p2);
-bool                    compare_points_x        (const point_t* p1, const point_t* p2);
 SLOPE_TYPE              min_slope               (point_set_t* P);
+int                     count_inversions        (vector<int>& arr);
 int                     count_slopes            (point_set_t* P, double alpha, double beta);
 SLOPE_TYPE              display_points          (point_set_t* P, int s, double alpha, double beta, int num_iterations);
 
