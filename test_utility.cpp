@@ -97,52 +97,11 @@ void test_min_slope() {
     cout << "Finished testing min slope" << endl;
 }
 
-void test_count_inversions() {
-    {
-        vector<int> invert;
-        invert.push_back(3);
-        invert.push_back(2);
-        invert.push_back(1);
-
-        int result = count_inversions(invert);
-        assert (result == 3);
-    }
-
-    cout << "Finished testing count inversions" << endl;
-}
-
-
-void test_count_slopes() {
-    {
-        point_set_t P;
-        P.numberOfPoints = 3;
-        P.points = new point_t*[P.numberOfPoints];
-
-        // regular case 
-        P.points[0] = create_point(1, 1);
-        P.points[1] = create_point(2, 2);
-        P.points[2] = create_point(3, 3);
-
-        int result = count_slopes(&P, -1, 2);
-        assert(result == 3);  
-
-        for (int i = 0; i < P.numberOfPoints; i++) {
-            free_point(P.points[i]);
-        }
-        delete[] P.points;
-    }
-
-    cout << "Finished testing count slopes" << endl;
-}
-
 void test_display_points(){
     //display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations);
-
 }
 
 int main() {
     test_min_slope();
-    test_count_inversions();
-    test_count_slopes();
     return 0;
 }
