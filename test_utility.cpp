@@ -321,9 +321,31 @@ void test_display_points_v2(){
         P.points[1] = create_point(2, 2);
         P.points[2] = create_point(3, 3);
 
-        display_points_v2(&P, 2, -1, 2, 3);
+        double alpha = min_slope(&P);
+        point_t** points_to_display = display_points_v2(&P, 2, alpha, 10, 100);
+
+        cout << points_to_display[0]->coord[0] << endl;
     }
-    cout << "Finished testing display points v2" << endl;
+
+    {
+        //display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations);
+
+        point_set_t P;
+        P.numberOfPoints = 3;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // regular case 
+        P.points[0] = create_point(1, 3);
+        P.points[1] = create_point(2, 2);
+        P.points[2] = create_point(3, 1);
+
+        double alpha = min_slope(&P);
+        point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 100);
+
+        cout << "min slope: " << alpha << endl;
+        cout << "x coordinate of first point to display: " << points_to_display[0]->coord[0] << endl;
+    }
+    cout << "Finished testing display points test" << endl;
 }
 
 int main() {

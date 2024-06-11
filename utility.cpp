@@ -8,9 +8,12 @@ using namespace std;
 
 //==============================================================================================
 // compute_slope
-// 
-// 
-// compute slope between two points
+// Computes the slope between points p1 and p2
+// Parameters:
+//      p1 - point 1
+//      p2 - point 2
+// Return: 
+//      Slope between p1 and p2 
 //==============================================================================================
 SLOPE_TYPE compute_slope(point_t* p1, point_t* p2) {
     if (p2->coord[0] == p1->coord[0]) {
@@ -19,12 +22,8 @@ SLOPE_TYPE compute_slope(point_t* p1, point_t* p2) {
     return (p2->coord[1] - p1->coord[1]) / (p2->coord[0] - p1->coord[0]);
 }
 
-
 //==============================================================================================
-// compute_slope
-// 
-// 
-// helper comparison function for sort
+// Helper function for comparison in min_slope
 //==============================================================================================
 bool compare_points_x(const point_t* p1, const point_t* p2) {
     return p1->coord[0] < p2->coord[0];
@@ -33,15 +32,18 @@ bool compare_points_x(const point_t* p1, const point_t* p2) {
 
 //==============================================================================================
 // min_slope
-// 
-// compute min slope
-// P: the input dataset
+// Bug:
+//      Does not work correctly with equal x values
+// Computes the minimum slope in a set of points P
+// Parameters:
+//      P - input data set
+// Return: 
+//      minimum slope in P
 //==============================================================================================
 SLOPE_TYPE min_slope(point_set_t* P) {
     if (P->numberOfPoints < 2) {
         return INF;
     }
-
     // sort points based on x-coordinate
     sort(P->points, P->points + P->numberOfPoints, compare_points_x);
 
@@ -53,11 +55,12 @@ SLOPE_TYPE min_slope(point_set_t* P) {
             min_slope = slope;
         }
     }
-
     return min_slope;
 }
 
-// helper comparison function for count_slopes: y at alpha
+//==============================================================================================
+// Helper function for comparison in count_slopes - y at alpha
+//==============================================================================================
 bool compare_points_alpha(const point_t& p1, const point_t& p2, double alpha) {
     return (p1.coord[0] * alpha - p1.coord[1]) < (p2.coord[0] * alpha - p2.coord[1]);
 }
@@ -71,7 +74,10 @@ struct Comparator_Alpha {
     }
 };
 
-// helper comparison function for count_slopes: y at beta
+//==============================================================================================
+// Helper function for comparison in count_slopes - y at beta
+//==============================================================================================
+
 bool compare_points_beta(const point_order_t& p1, const point_order_t& p2, double beta) {
     return (p1.point->coord[0] * beta - p1.point->coord[1]) < (p2.point->coord[0] * beta - p2.point->coord[1]);
 }
@@ -85,17 +91,27 @@ struct Comparator_Beta {
     }
 };
 
-// function declaration
+//==============================================================================================
+// Helper functions for counting inversions in count_slopes
+//==============================================================================================
 int mergesort_and_count(vector<int>& arr, vector<int>& temp, int left, int right);
 int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int right);
 
-// sort the array and count inversions
+//==============================================================================================
+// count_inversions
+// Counts the number of inversions in a vector / array with Merge Sort logic
+// Parameters: 
+//      arr - vector of intergers
+// Postcondition:
+//      arr is sorted in non-descending order
+// Return:
+//      number of inversions in arr
+//==============================================================================================
 int count_inversions(vector<int>& arr) {
     vector<int> temp(arr.size());
     return mergesort_and_count(arr, temp, 0, arr.size() - 1);
 }
 
-// recursively sort and count inversions
 int mergesort_and_count(vector<int>& arr, vector<int>& temp, int left, int right) {
     int mid, inversionCount = 0;
     if (left < right) {
@@ -113,7 +129,6 @@ int mergesort_and_count(vector<int>& arr, vector<int>& temp, int left, int right
     return inversionCount;
 }
 
-// merge two sorted halves of the array and count inversions
 int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int right) {
     int i = left;    // starting index for left subarray
     int j = mid;     // starting index for right subarray
@@ -124,9 +139,10 @@ int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int 
     while ((i <= mid - 1) && (j <= right)) {
         if (arr[i] <= arr[j]) {
             temp[k++] = arr[i++];
-        } else {
+        } 
+        else {
             temp[k++] = arr[j++];
-            inversionCount += (mid - i);  // count inversions
+            inversionCount += (mid - i);    // count inversions
         }
     }
 
@@ -148,7 +164,16 @@ int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int 
     return inversionCount;
 }
 
-// count the number of slopes between the range [alpha, beta]
+//==============================================================================================
+// count_slopes
+// Counts the number of slopes in range [alpha, beta]
+// Parameters: 
+//      P       - input data set
+//      alpha   - lower threshold
+//      beta    - upper threshold
+// Return:
+//      number of slopes in range [alpha, beta]
+//==============================================================================================
 int count_slopes(point_set_t* P, double alpha, double beta) {
     // sort points based on y_at_alpha value
     sort(P->points, P->points + P->numberOfPoints, Comparator_Alpha(alpha));
@@ -166,14 +191,14 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
     // sort points based on y_at_beta value
     sort(point_order.begin(), point_order.end(), Comparator_Beta(beta));
 
-    // initialize inverted order array
+    // put order of y_at_beta into vector inverted_order
     vector<int> inverted_order;
     for (int i = 0; i < point_order.size(); i++) {
         int order = point_order[i].order;
         inverted_order.push_back(order);
     }
 
-    // perform sort and count on inverted order array
+    // perform count_inversion / sort and count on inverted order array
     int inversionCount = count_inversions(inverted_order);
 
     return inversionCount;
@@ -181,14 +206,24 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
 
 //==============================================================================================
 // display_points_v2
-// 
-// randomly select set of points and compute their slopes
-// check if their slopes are in the range of alpha and beta, add to points_to_display if so
+// Displays a set of points for interaction that most evenly 
+// divides the range ratio u_i / u_x
+// Parameters: 
+//      P       - input data set
+//      s       - number of points to display
+//      alpha   - lower threshold
+//      beta    - upper threshold
+// Return:
+//      A set of points that most evenly divides the range ratio u_i / u_x
 //==============================================================================================
 point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations) {
     
     // initialize set of points to display
-    point_t* points_to_display[s];
+    point_t** points_to_display = new point_t*[s]; 
+
+    for (int i = 0; i < s; i++) {
+        points_to_display[i] = nullptr; 
+    }
 
     SLOPE_TYPE current_slope;
     double min_difference = INF;
@@ -228,14 +263,6 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
             }
         }
     }
-
-    cout << "min difference: " << min_difference << endl;
-    cout << "point 1: (" << points_to_display[0] -> coord[0] << ", " << points_to_display[0] -> coord[1] << ")" << endl;
-    cout << "point 2: (" << points_to_display[1] -> coord[0] << ", " << points_to_display[1] -> coord[1] << ")" << endl;
-
-
-    // cout << "point 1: " << &ptr1 << endl;
-    // cout << "point 2: " << &ptr2 << endl;
 
     return points_to_display;
 }

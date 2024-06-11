@@ -14,7 +14,6 @@
 typedef struct point_order
 {
     point_t *point;
-    // order when sort y values at x = alpha
     int order;
 }   point_order_t;
 
