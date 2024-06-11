@@ -32,6 +32,8 @@ bool compare_points_x(const point_t* p1, const point_t* p2) {
 
 //==============================================================================================
 // min_slope
+// Bug:
+//      Does not work correctly with equal x values
 // Computes the minimum slope in a set of points P
 // Parameters:
 //      P - input data set
@@ -217,7 +219,11 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
 point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations) {
     
     // initialize set of points to display
-    point_t* points_to_display[s];
+    point_t** points_to_display = new point_t*[s]; 
+
+    for (int i = 0; i < s; i++) {
+        points_to_display[i] = nullptr; 
+    }
 
     SLOPE_TYPE current_slope;
     double min_difference = INF;
@@ -257,14 +263,6 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
             }
         }
     }
-
-    cout << "min difference: " << min_difference << endl;
-    cout << "point 1: (" << points_to_display[0] -> coord[0] << ", " << points_to_display[0] -> coord[1] << ")" << endl;
-    cout << "point 2: (" << points_to_display[1] -> coord[0] << ", " << points_to_display[1] -> coord[1] << ")" << endl;
-
-
-    // cout << "point 1: " << &ptr1 << endl;
-    // cout << "point 2: " << &ptr2 << endl;
 
     return points_to_display;
 }
