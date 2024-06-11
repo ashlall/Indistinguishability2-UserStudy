@@ -161,18 +161,6 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
     return inversionCount;
 }
 
-int count_slopes(point_set_t* P, double alpha, double beta) {
-    int num_slopes;
-    SLOPE_TYPE y_at_alpha;
-
-    // compute y values at x = alpha for all point-line
-    for (int i = 0; i < P->numberOfPoints; i++) {
-        point_t *currentPoint = P->points[i];
-        y_at_alpha = currentPoint -> coord[0] * alpha - currentPoint->coord[1];
-    }
-    return num_slopes;
-}
-
 //==============================================================================================
 // display_points
 // randomly select set of points and compute their slopes
