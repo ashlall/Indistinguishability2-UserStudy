@@ -185,12 +185,11 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
 // randomly select set of points and compute their slopes
 // check if their slopes are in the range of alpha and beta, add to points_to_display if so
 //==============================================================================================
-point_set_t display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations){
+point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations) {
     
-    // initialiaze required variables
-    point_t* point1;
-    point_t* point2;
-    point_set_t* points_to_display;                                               
+    // initialize set of points to display
+    point_t* points_to_display[s];
+
     SLOPE_TYPE current_slope;
     double min_difference = INF;
     int rand_index1;
@@ -199,7 +198,6 @@ point_set_t display_points_v2(point_set_t* P, int s, double alpha, double beta, 
 
     int slope_count = count_slopes(P, alpha, beta);
     int mid = slope_count / 2;
-
 
     // generate random seed based on time
     srand (time(NULL));
@@ -210,8 +208,8 @@ point_set_t display_points_v2(point_set_t* P, int s, double alpha, double beta, 
         rand_index1 = rand() % P -> numberOfPoints;
         rand_index2 = rand() % P -> numberOfPoints;    
 
-        point1 = P -> points[rand_index1];                  
-        point2 = P -> points[rand_index2];
+        point_t* point1 = P -> points[rand_index1];                  
+        point_t* point2 = P -> points[rand_index2];
 
         // compute slope
         current_slope = compute_slope(point1, point2);          
@@ -225,23 +223,19 @@ point_set_t display_points_v2(point_set_t* P, int s, double alpha, double beta, 
         
                     // update min_difference and its pair of points
                     min_difference = abs(current_slope_count - mid);
-                    points_to_display -> points[0] = point1;               
-                    points_to_display -> points[1] = point2;  
+                    points_to_display[0] = point1;               
+                    points_to_display[1] = point2;  
             }
         }
     }
 
     cout << "min difference: " << min_difference << endl;
-    cout << "point 1: (" << points_to_display -> points[0] -> coord[0] << ", " << points_to_display -> points[0] -> coord[1] << endl;
-    cout << "point 2: (" << points_to_display -> points[1] -> coord[0] << ", " << points_to_display -> points[1] -> coord[1] << endl;
-
-    // Pointers to the memory addresses
-    point_t *ptr1 = points_to_display -> points[0];
-    point_t *ptr2 = points_to_display -> points[1];
+    cout << "point 1: (" << points_to_display[0] -> coord[0] << ", " << points_to_display[0] -> coord[1] << ")" << endl;
+    cout << "point 2: (" << points_to_display[1] -> coord[0] << ", " << points_to_display[1] -> coord[1] << ")" << endl;
 
 
     // cout << "point 1: " << &ptr1 << endl;
     // cout << "point 2: " << &ptr2 << endl;
 
-    return *points_to_display;
+    return points_to_display;
 }
