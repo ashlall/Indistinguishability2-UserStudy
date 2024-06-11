@@ -161,43 +161,80 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
     return inversionCount;
 }
 
+int count_slopes(point_set_t* P, double alpha, double beta) {
+    int num_slopes;
+    SLOPE_TYPE y_at_alpha;
+
+    // compute y values at x = alpha for all point-line
+    for (int i = 0; i < P->numberOfPoints; i++) {
+        point_t *currentPoint = P->points[i];
+        y_at_alpha = currentPoint -> coord[0] * alpha - currentPoint->coord[1];
+    }
+    return num_slopes;
+}
+
+//==============================================================================================
+// display_points
 // randomly select set of points and compute their slopes
 // check if their slopes are in the range of alpha and beta, add to s_hat if so
-SLOPE_TYPE display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations){
+//==============================================================================================
+point_pair_t display_points(point_set_t* P, int s, double alpha, double beta, int num_iterations){
+    
+    // place holders for the random two points that make a slope
     point_t* point1;
     point_t* point2;
-    point_pair_t* current_point_pair;                       // create point pair object
-    s_point_set_t* SS;                                      // create S hat point pair set                      
+    
+    // create point pair object
+    point_pair_t* current_point_pair;
+    
+    // create S hat point pair set     
+    s_point_set_t* s_hat;                                               
+   
     SLOPE_TYPE current_slope;
-    SLOPE_TYPE median_slope;
+    point_pair_t* median_slope_pair;
 
+    // initializing random index
     int rand_index1;
     int rand_index2;
-    srand (time(NULL));                                     // generate random seed based on time
 
-    // generate random pairs of points, find their slope, see if it's in range, add to SS
-    for (int i = 0; i < num_iterations; i++){              // for each iteration, generate random pairs of points
-        rand_index1 = rand() % P -> numberOfPoints;         // generate random index between 0 and numberOfPoints  
-        rand_index2 = rand() % P -> numberOfPoints;    
+    // generate random seed based on time
+    srand (time(NULL));
+
+    // generate random pairs of points, find their slope, see if it's in range, add to s_hat
+    for (int i = 0; i < num_iterations; i++){
         
-        point1 = P -> points[rand_index1];                  // should be accessing point_t*
-        point2 = P -> points[rand_index2];
-        current_slope = compute_slope(point1, point2);          // find slope of pair
+        // for each iteration, generate random pairs of points where random index is between 0 and numberOfPoints
+        rand_index1 = rand() % P -> numberOfPoints;
+        cout << "random index 1: " << rand_index1 << endl; 
 
-        current_point_pair -> pair[0] = point1;               // Save object's attributes
+        rand_index2 = rand() % P -> numberOfPoints;    
+        cout << "random index 2: " << rand_index2 << endl;       
+
+        
+        // use random index to get random points from the whole point set
+        point1 = P -> points[rand_index1];                  
+        point2 = P -> points[rand_index2];
+
+        // find slope of pair
+        current_slope = compute_slope(point1, point2);          
+
+        // Save object's attributes
+        current_point_pair -> pair[0] = point1;               
         current_point_pair -> pair[1] = point2;
         current_point_pair -> slope = current_slope;
 
-        // if slope is within bounds, add point pair to SS and increment numberOfPairs
+        // if slope is within bounds, add point pair to s_hat and increment numberOfPairs
         if (current_slope >= alpha && current_slope <= beta){
-            SS -> point_pairs[SS -> numberOfPairs] = current_point_pair;
-            SS -> numberOfPairs += 1;
+            s_hat -> point_pairs[s_hat -> numberOfPairs] = current_point_pair;
+            s_hat -> numberOfPairs += 1;
         }
-
-    // find median slope (generalize for other S in the future)
-    int median_index = (SS -> numberOfPairs) / 2;
-    median_slope = SS -> point_pairs[median_index] -> slope;
-    //RETURN PAIR THAT MAKES MEDIAN SLOPE INSEAD!!!!!
-    return median_slope; // return median_slope or SS? add median to SS as an instance variable?
     }
+    
+    // find median slope (generalize for other S in the future)
+    // NEED TO SORT
+    int median_index = (s_hat -> numberOfPairs) / 2;
+    median_slope_pair = s_hat -> point_pairs[median_index];
+
+    // returns the pair that gives median slope
+    return *median_slope_pair; 
 }

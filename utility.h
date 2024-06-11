@@ -38,7 +38,7 @@ SLOPE_TYPE              compute_slope           (point_t* p1, point_t* p2);
 SLOPE_TYPE              min_slope               (point_set_t* P);
 int                     count_inversions        (vector<int>& arr);
 int                     count_slopes            (point_set_t* P, double alpha, double beta);
-SLOPE_TYPE              display_points          (point_set_t* P, int s, double alpha, double beta, int num_iterations);
+point_pair_t            display_points          (point_set_t* P, int s, double alpha, double beta, int num_iterations);
 
 
 #endif
