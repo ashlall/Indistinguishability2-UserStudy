@@ -233,7 +233,7 @@ void test_min_slope() {
         P.points[19] = create_point(14, 7000); 
 
         SLOPE_TYPE result = min_slope(&P);
-        cout<< result<< endl;
+        //cout<< result<< endl;
         // result min_slope = -19646.6     // incorrect, probably made from (1,1) and (2,175.25)
         // assert(result == -1999824.75);  // made from points (1,200000) and (2,175.25)
         // current bug from adjacent points with same x-values, missing out from true min_slope
@@ -287,7 +287,7 @@ void test_count_slopes() {
         P.numberOfPoints = 5;
         P.points = new point_t*[P.numberOfPoints];
 
-        // regular case 
+        // regular case, more points
         P.points[0] = create_point(1, 6);
         P.points[1] = create_point(2, 4);
         P.points[2] = create_point(3, 5);
@@ -295,8 +295,86 @@ void test_count_slopes() {
         P.points[4] = create_point(5, 0.5);
 
         int result = count_slopes(&P, -15, 0);
-        cout << "count_slopes result: " << result << endl;
-        //assert(result == 6);  
+        assert(result == 5);  
+
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    }
+
+    {
+        point_set_t P;
+        P.numberOfPoints = 0;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // edge case - no points
+        int result = count_slopes(&P, -15, 0);
+        assert(result == 0);  
+
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    }
+
+    {
+        point_set_t P;
+        P.numberOfPoints = 0;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // edge case - only positive slopes
+        P.points[0] = create_point(1, 10);
+        P.points[1] = create_point(2, 12);
+        P.points[2] = create_point(3, 33);
+        P.points[3] = create_point(4, 39);
+        P.points[4] = create_point(5, 64);
+
+        int result = count_slopes(&P, -100, 0);
+        assert(result == 0);  
+
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    }
+
+    {
+        point_set_t P;
+        P.numberOfPoints = 4;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // regular case - checking float values
+        P.points[0] = create_point(2.5, 5.5);
+        P.points[1] = create_point(3.6, 2.1);
+        P.points[2] = create_point(6.7, 6.7);
+        P.points[3] = create_point(8.05, 1.05);
+
+        int result = count_slopes(&P, -2.5, 0);
+        assert(result == 2);  
+
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    }
+
+    {
+        point_set_t P;
+        P.numberOfPoints = 3;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // edge case - slopes are exactly alpha or beta
+        P.points[0] = create_point(2.5, 5.5);
+        P.points[1] = create_point(3.5, 2.75);
+        P.points[2] = create_point(4, 3);
+
+        int result = count_slopes(&P, -2.75, 0.5);
+        cout << "count_slopes result : " << result << endl;
+        // This results with the slope count being 1. I expected it to be 3, because
+        // two of the slopes are exactly alpha and beta, and the last slope is between them.
+        // So, I believe that count_slopes is excluding slopes that are exactly alpha and beta
+        //assert(result == 3);  
 
         for (int i = 0; i < P.numberOfPoints; i++) {
             free_point(P.points[i]);
