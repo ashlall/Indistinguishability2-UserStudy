@@ -218,6 +218,11 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
 //==============================================================================================
 point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations) {
     
+    // edge case - when beta is smaller than the minimum
+    // if (min_slope(P) > beta){
+    //     ;
+    // }
+
     // initialize set of points to display
     point_t** points_to_display = new point_t*[s]; 
 
@@ -232,7 +237,7 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
     double current_slope_count;
 
     int slope_count = count_slopes(P, alpha, beta);
-    int mid = slope_count / 2;
+    int mid = round(slope_count / 2);
 
     // generate random seed based on time
     srand (time(NULL));
