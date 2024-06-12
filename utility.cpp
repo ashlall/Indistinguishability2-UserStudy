@@ -210,7 +210,7 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
 // divides the range ratio u_i / u_x
 // Parameters: 
 //      P       - input data set
-//      s       - number of points to display
+//      s       - number of points to display each round
 //      alpha   - lower threshold
 //      beta    - upper threshold
 // Return:
@@ -265,4 +265,127 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
     }
 
     return points_to_display;
+}
+
+//==============================================================================================
+// breakpoint_one_round
+// Helper function for breakpoint - Simulate one round of interaction
+// Parameters: 
+//      P           - input data set
+//      alpha       - lower slope threshold 
+//      beta        - upper slope threshold
+// Return:
+//      slope of the most even breakpoint
+//==============================================================================================
+
+COORD_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta) {
+    // Set up
+    point_t** points_to_display = new point_t*[s]; 
+
+    for (int i = 0; i < s; i++) {
+        points_to_display[i] = nullptr; 
+    }
+
+    int num_iterations = 100;
+
+    SLOPE_TYPE current_slope;
+    double min_difference = INF;
+    int rand_index1;
+    int rand_index2;
+    double current_slope_count;
+
+    // calculate total slope between alpha and beta
+    int total_slopes = count_slopes(P, alpha, beta);
+    int mid = total_slopes / 2;
+
+    // generate random seed based on time
+    srand (time(NULL));
+
+    for (int i = 0; i < num_iterations; i++){
+        
+        // generate random pairs of points
+        int rand_index1 = rand() % P -> numberOfPoints;
+        int rand_index2 = rand() % P -> numberOfPoints;    
+
+        point_t* point1 = P -> points[rand_index1];                  
+        point_t* point2 = P -> points[rand_index2];
+
+        // compute slope
+        current_slope = compute_slope(point1, point2);          
+
+        // check if slope within range
+        if (current_slope >= alpha && current_slope <= beta){
+            
+            current_slope_count = count_slopes(P, alpha, current_slope);            
+            
+            if (abs(current_slope_count - mid) < min_difference){
+        
+                    // update min_difference and its pair of points
+                    min_difference = abs(current_slope_count - mid);
+                    points_to_display[0] = point1;               
+                    points_to_display[1] = point2;  
+            }
+        }
+    }
+
+    SLOPE_TYPE best_slope = compute_slope(points_to_display[0], points_to_display[1]); 
+
+    return best_slope;
+}
+
+//==============================================================================================
+// breakpoint
+// Problem:
+//      Cannot work with multiple dimesion yet, only work with 2 dimensions
+//      -> fix other functions (all slope-related is 2-d) to work with multiple dimension
+//      -> will take in a parameter to set anchor index (u_i/u_a instead of u_i/u_1) -> a replaces 1 for testing purposes
+//      Lack pre-condition checking - e.g: whether negative slopes exist, what to do when no points to display
+// Description:
+//      Simulate interaction with multiple rounds of interaction
+// Parameters: 
+//      P           - input data set
+//      u           - unknown utility vector
+//      s           - number of points to display each round
+//      maxRound    - maximum number of rounds of interactions / budget of questions
+// Return:
+//      For now, estimated utility vector
+//      Not sure yet, add in later - What is the most helpful value to return?
+//==============================================================================================
+
+point_t* breakpoint(point_set_t* P, point_t* u, int s, int maxRound) {
+    //Set up 
+    int dim = P->points[0]->dim;
+    point_t* estimated_u = new point_t;
+    estimated_u->dim = dim;
+
+    SLOPE_TYPE slope_breakpoint;
+    COORD_TYPE ratio_breakpoint;
+
+    double alpha = min_slope(P);
+    double beta = 0;
+
+    for (int round = 0; round < maxRound; round++) {
+        // find points that divides the range alpha beta most evenly, take that slope
+        slope_breakpoint = breakpoint_one_round(P, s, alpha, beta);
+        ratio_breakpoint = -1 / slope_breakpoint;
+        
+        // simulate user interaction
+        if (u->coord[1]/u->coord[0] < ratio_breakpoint) {
+            beta = slope_breakpoint;
+        }
+        else {
+            alpha = slope_breakpoint;
+        }
+    }
+
+    // To do: write a funtion in header file to convert slope to ratio and vice versa for cleaner code
+    SLOPE_TYPE average_slope = (beta - alpha) / 2;
+    COORD_TYPE estimated_ratio = - 1 /average_slope;
+
+    // Modify estimated_u - This is currently a bad way to do it
+    estimated_u->coord = new double[2];
+    estimated_u->coord[0] = 1;
+    estimated_u->coord[1] = estimated_ratio;
+
+    return estimated_u;
 }

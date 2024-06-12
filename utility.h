@@ -24,6 +24,8 @@ SLOPE_TYPE              min_slope               (point_set_t* P);
 int                     count_inversions        (vector<int>& arr);
 int                     count_slopes            (point_set_t* P, double alpha, double beta);
 point_t**               display_points_v2       (point_set_t* P, int s, double alpha, double beta, int num_iterations);
+COORD_TYPE              breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta);
+point_t*                breakpoint              (point_set_t* P, point_t* u, int s, int maxRound);
 
 
 #endif
