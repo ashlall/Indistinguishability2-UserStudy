@@ -44,6 +44,10 @@ bool compare_points_x(const point_t* p1, const point_t* p2) {
 // min_slope
 // Bug:
 //      Does not work correctly with equal x values ----- SOLVED
+//      Does not work correctly with equal x values
+//      Oghap's comments:
+//          Figure out a way to deal with two points
+//          However, it does not work with multiple points with equal x values.
 // Computes the minimum slope in a set of points P
 // Parameters:
 //      P - input data set
@@ -234,6 +238,11 @@ int count_slopes(point_set_t* P, double alpha, double beta) {
 //==============================================================================================
 point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations) {
     
+    // edge case - when beta is smaller than the minimum
+    // if (min_slope(P) > beta){
+    //     ;
+    // }
+
     // initialize set of points to display
     point_t** points_to_display = new point_t*[s]; 
 
@@ -248,7 +257,8 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
     double current_slope_count;
 
     int slope_count = count_slopes(P, alpha, beta);
-    int mid = slope_count / 2;
+    int mid = ceil(slope_count / 2);
+    cout << "estimate median slope count: " << mid << endl;
 
     // generate random seed based on time
     srand (time(NULL));
@@ -271,6 +281,8 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
             current_slope_count = count_slopes(P, alpha, current_slope);            
             
             if (abs(current_slope_count - mid) < min_difference){
+
+                    cout << "current estimate of median slope count: " << abs(current_slope_count - mid) << endl;
         
                     // update min_difference and its pair of points
                     min_difference = abs(current_slope_count - mid);
