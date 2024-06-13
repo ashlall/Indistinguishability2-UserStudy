@@ -23,17 +23,27 @@ SLOPE_TYPE compute_slope(point_t* p1, point_t* p2) {
 }
 
 //==============================================================================================
-// Helper function for comparison in min_slope
+// Helper function for comparison in min_slope for x - coord
 //==============================================================================================
 bool compare_points_x(const point_t* p1, const point_t* p2) {
-    return p1->coord[0] < p2->coord[0];
+
+    // O.G. version
+    // return p1->coord[0] < p2->coord[0];
+
+    // fixed version with Dr. Lall
+    // compares x values first, if same, then smaller y gets sort first
+    if (abs(p1->coord[0] - p2->coord[0]) < .0001){ 
+         return p1->coord[1] < p2->coord[1];
+    } else {
+        return p1->coord[0] < p2->coord[0];
+    }
 }
 
 
 //==============================================================================================
 // min_slope
 // Bug:
-//      Does not work correctly with equal x values
+//      Does not work correctly with equal x values ----- SOLVED
 // Computes the minimum slope in a set of points P
 // Parameters:
 //      P - input data set
@@ -44,8 +54,14 @@ SLOPE_TYPE min_slope(point_set_t* P) {
     if (P->numberOfPoints < 2) {
         return INF;
     }
+
     // sort points based on x-coordinate
     sort(P->points, P->points + P->numberOfPoints, compare_points_x);
+    // prints out in the sorted order
+    for (int i = 0; i < P->numberOfPoints; i++) {
+            cout << "x: " << P-> points[i]->coord[0]  << endl;
+            cout << "y: " << P->points[i]->coord[1]  << endl << endl;
+        }
 
     // compute slopes of adjacent points
     SLOPE_TYPE min_slope = INF;
