@@ -430,7 +430,8 @@ point_t* breakpoint(point_set_t* P, point_t* u, int s, int maxRound) {
     }
 
     // To do: write a funtion in header file to convert slope to ratio and vice versa for cleaner code
-    SLOPE_TYPE average_slope = (beta - alpha) / 2;
+    // CONSIDER TAKE AVERAGE OF BREAKPOINT INSTEAD OF SLOPES
+    SLOPE_TYPE average_slope = (beta + alpha) / 2;
     COORD_TYPE estimated_ratio = - 1 /average_slope;
 
     // Modify estimated_u - This is currently a bad way to do it
