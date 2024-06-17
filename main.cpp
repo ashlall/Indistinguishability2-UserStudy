@@ -193,7 +193,7 @@ void run_test(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
 	Isize++;
     }
 
-
+  //double alpha BP = 
   double alpha_SU = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
   double alpha_RF = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
   double alpha_MD = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
