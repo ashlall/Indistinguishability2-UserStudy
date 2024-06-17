@@ -23,17 +23,31 @@ SLOPE_TYPE compute_slope(point_t* p1, point_t* p2) {
 }
 
 //==============================================================================================
-// Helper function for comparison in min_slope
+// Helper function for comparison in min_slope for x - coord
 //==============================================================================================
 bool compare_points_x(const point_t* p1, const point_t* p2) {
-    return p1->coord[0] < p2->coord[0];
+
+    // O.G. version
+    // return p1->coord[0] < p2->coord[0];
+
+    // fixed version with Dr. Lall
+    // compares x values first, if same, then smaller y gets sort first
+    if (abs(p1->coord[0] - p2->coord[0]) < .0001){ 
+         return p1->coord[1] < p2->coord[1];
+    } else {
+        return p1->coord[0] < p2->coord[0];
+    }
 }
 
 
 //==============================================================================================
 // min_slope
 // Bug:
+//      Does not work correctly with equal x values ----- SOLVED
 //      Does not work correctly with equal x values
+//      Oghap's comments:
+//          Figure out a way to deal with two points
+//          However, it does not work with multiple points with equal x values.
 // Computes the minimum slope in a set of points P
 // Parameters:
 //      P - input data set
@@ -44,8 +58,14 @@ SLOPE_TYPE min_slope(point_set_t* P) {
     if (P->numberOfPoints < 2) {
         return INF;
     }
+
     // sort points based on x-coordinate
     sort(P->points, P->points + P->numberOfPoints, compare_points_x);
+    // prints out in the sorted order
+    for (int i = 0; i < P->numberOfPoints; i++) {
+            cout << "x: " << P-> points[i]->coord[0]  << endl;
+            cout << "y: " << P->points[i]->coord[1]  << endl << endl;
+        }
 
     // compute slopes of adjacent points
     SLOPE_TYPE min_slope = INF;
@@ -237,7 +257,8 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
     double current_slope_count;
 
     int slope_count = count_slopes(P, alpha, beta);
-    int mid = round(slope_count / 2);
+    int mid = ceil(slope_count / 2);
+    cout << "estimate median slope count: " << mid << endl;
 
     // generate random seed based on time
     srand (time(NULL));
@@ -260,6 +281,8 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
             current_slope_count = count_slopes(P, alpha, current_slope);            
             
             if (abs(current_slope_count - mid) < min_difference){
+
+                    cout << "current estimate of median slope count: " << abs(current_slope_count - mid) << endl;
         
                     // update min_difference and its pair of points
                     min_difference = abs(current_slope_count - mid);
