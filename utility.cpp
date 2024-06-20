@@ -25,25 +25,29 @@ SLOPE_TYPE compute_slope(point_t* p1, point_t* p2, int dim_a, int dim_i) {
 //==============================================================================================
 // Helper function for comparison in min_slope for x - coord
 //==============================================================================================
-bool compare_points_x(const point_t* p1, const point_t* p2) {
-    // compares x values first, if same, then smaller y gets sort first
-    if (abs(p1->coord[0] - p2->coord[0]) < .0001) { 
-         return p1->coord[1] < p2->coord[1];
+
+bool compare_points_x(const point_t& p1, const point_t& p2, int dim_a, int dim_i) {
+    if (abs(p1.coord[dim_a] - p2.coord[dim_a]) < .0001) { 
+         return p1.coord[dim_i] < p2.coord[dim_i];
     } 
     else {
-        return p1->coord[0] < p2->coord[0];
+        return p1.coord[dim_a] < p2.coord[dim_a];
     }
 }
+
+struct Comparator_X {
+    int dim_a;
+    int dim_i;
+    Comparator_X(int a, int i) : dim_a(a), dim_i(i) {}
+
+    bool operator()(const point_t* p1, const point_t* p2) const {
+        return compare_points_x(*p1, *p2, dim_a, dim_i);
+    }
+};
 
 
 //==============================================================================================
 // min_slope
-// Bug:
-//      Does not work correctly with equal x values ----- SOLVED
-//      Does not work correctly with equal x values
-//      Oghap's comments:
-//          Figure out a way to deal with two points
-//          However, it does not work with multiple points with equal x values. - ?
 // Computes the minimum slope in a set of points P
 // Parameters:
 //      P       - input data set
@@ -58,12 +62,7 @@ SLOPE_TYPE min_slope(point_set_t* P, int dim_a, int dim_i) {
     }
 
     // sort points based on x-coordinate
-    sort(P->points, P->points + P->numberOfPoints, compare_points_x);
-    // prints out in the sorted order
-    // for (int i = 0; i < P->numberOfPoints; i++) {
-    //         cout << "x: " << P-> points[i]->coord[0]  << endl;
-    //         cout << "y: " << P->points[i]->coord[1]  << endl << endl;
-    //     }
+    sort(P->points, P->points + P->numberOfPoints, Comparator_X(dim_a, dim_i));
 
     // compute slopes of adjacent points
     SLOPE_TYPE min_slope = INF;
@@ -198,7 +197,6 @@ int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int 
 //      number of slopes in range [alpha, beta]
 //==============================================================================================
 int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
-    
     if (adjust == true){
         alpha -= 0.0001;
         beta += 0.0001;
