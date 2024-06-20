@@ -15,11 +15,11 @@ using namespace std;
 // Return: 
 //      Slope between p1 and p2 
 //==============================================================================================
-SLOPE_TYPE compute_slope(point_t* p1, point_t* p2, int dim_a, int dim_i) {
-    if (p2->coord[dim_a] == p1->coord[dim_a]) {
+SLOPE_TYPE compute_slope(point_t* p1, point_t* p2) {
+    if (p2->coord[0] == p1->coord[0]) {
         return INF; 
     }
-    return (p2->coord[dim_i] - p1->coord[dim_i]) / (p2->coord[dim_a] - p1->coord[dim_i]);
+    return (p2->coord[1] - p1->coord[1]) / (p2->coord[0] - p1->coord[0]);
 }
 
 //==============================================================================================
@@ -47,12 +47,12 @@ bool compare_points_x(const point_t* p1, const point_t* p2) {
 // Computes the minimum slope in a set of points P
 // Parameters:
 //      P       - input data set
-//      dim_a   - anchor dimension
+//      0   - anchor dimension
 //      dim_i   - current dimension
 // Return: 
 //      minimum slope in P in dimension a and i
 //==============================================================================================
-SLOPE_TYPE min_slope(point_set_t* P, int dim_a, int dim_i) {
+SLOPE_TYPE min_slope(point_set_t* P) {
     if (P->numberOfPoints < 2) {
         return INF;
     }
@@ -61,14 +61,14 @@ SLOPE_TYPE min_slope(point_set_t* P, int dim_a, int dim_i) {
     sort(P->points, P->points + P->numberOfPoints, compare_points_x);
     // prints out in the sorted order
     for (int i = 0; i < P->numberOfPoints; i++) {
-            cout << "x: " << P-> points[i]->coord[dim_a]  << endl;
-            cout << "y: " << P->points[i]->coord[dim_i]  << endl << endl;
+            cout << "x: " << P-> points[i]->coord[0]  << endl;
+            cout << "y: " << P->points[i]->coord[1]  << endl << endl;
         }
 
     // compute slopes of adjacent points
     SLOPE_TYPE min_slope = INF;
     for (int i = 0; i < P->numberOfPoints - 1; i++) {
-        SLOPE_TYPE slope = compute_slope(P->points[i], P->points[i+1], dim_a, dim_i);
+        SLOPE_TYPE slope = compute_slope(P->points[i], P->points[i+1]);
         if (slope < min_slope) {
             min_slope = slope;
         }

@@ -765,6 +765,7 @@ void update_ext_vec(point_set_t* P, vector<point_t*> S, vector<int>& C_idx, int 
 	//C_idx = newC_idx;
 }
 
+
 // the main interactive algorithm for real points
 // P: the input dataset (assumed skyline)
 // u: the unkonwn utility vector
