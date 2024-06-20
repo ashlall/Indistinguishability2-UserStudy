@@ -267,15 +267,15 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
     int rand_index2;
     double current_slope_count;
 
-    int slope_count = count_slopes(P, alpha, beta);
+    int slope_count = count_slopes(P, alpha, beta, true);
     cout << "total initial slope count: " << slope_count << endl;
 
-    int mid = ceil(slope_count / 2);
+    int mid = slope_count / 2;
     if (slope_count % 2 != 0){
         mid++;
     }
 
-    cout << "estimate median slope count: " << mid << endl;
+    cout << "median slope count: " << mid << endl;
 
     // generate random seed based on time
     srand (time(NULL));
@@ -295,7 +295,7 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
         // check if slope within range
         if (current_slope >= alpha && current_slope <= beta){
             
-            current_slope_count = count_slopes(P, alpha, current_slope);    
+            current_slope_count = count_slopes(P, alpha, current_slope, true);    
 
             if (abs(current_slope_count - mid) == 0){
                 points_to_display[0] = point1;               

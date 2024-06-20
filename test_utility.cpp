@@ -534,28 +534,28 @@ void test_display_points_v2(){
 
     // }
 
-    // {
-    //     point_set_t P;
-    //     P.numberOfPoints = 5;
-    //     P.points = new point_t*[P.numberOfPoints];
+    {
+        point_set_t P;
+        P.numberOfPoints = 5;
+        P.points = new point_t*[P.numberOfPoints];
 
-    //     // regular case 
-    //     P.points[0] = create_point(2, 3);
-    //     P.points[1] = create_point(5, 8);
-    //     P.points[2] = create_point(7, 2);
-    //     P.points[3] = create_point(9, 6);
-    //     P.points[4] = create_point(11, 10);
+        // regular case 
+        P.points[0] = create_point(2, 3);
+        P.points[1] = create_point(5, 8);
+        P.points[2] = create_point(7, 2);
+        P.points[3] = create_point(9, 6);
+        P.points[4] = create_point(11, 10);
 
-    //     double alpha = min_slope(&P);
-    //     point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 100);
+        double alpha = min_slope(&P);
+        point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 100);
 
-    //     cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
-    //     cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
+        cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
+        cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
 
-    //     cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
-    //     cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
+        cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
+        cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
 
-    //  }
+     }
 
     // {
     //     point_set_t P;
@@ -605,9 +605,9 @@ void test_display_points_v2(){
 }
 
 int main() {
-    test_min_slope();
-    test_count_inversions();
-    test_count_slopes();
+    // test_min_slope();
+    // test_count_inversions();
+    // test_count_slopes();
     test_display_points_v2();
     
     return 0;
