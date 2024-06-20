@@ -233,10 +233,7 @@ void test_min_slope() {
         P.points[19] = create_point(14, 7000); 
 
         SLOPE_TYPE result = min_slope(&P);
-        //cout<< result<< endl;
-        // result min_slope = -19646.6     // incorrect, probably made from (1,1) and (2,175.25)
-        // assert(result == -1999824.75);  // made from points (1,200000) and (2,175.25)
-        // current bug from adjacent points with same x-values, missing out from true min_slope
+        assert(abs(-1999824.75 - result)<0.001);   // made from points (1,200000) and (2,175.25)
 
         for (int i = 0; i < P.numberOfPoints; i++) {
             free_point(P.points[i]);
@@ -244,6 +241,90 @@ void test_min_slope() {
         delete[] P.points;
     }
 
+    {
+        point_set_t P;
+        P.numberOfPoints = 3;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // checking points with same x- values to see if sorted properly
+        P.points[0] = create_point(4, 20); //a
+        P.points[1] = create_point(4, 5); //b
+        P.points[2] = create_point(1, 25); //c
+
+        SLOPE_TYPE result = min_slope(&P);
+        assert(abs(-6.66667-result)<.0001);  
+
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    }  
+
+        {
+        point_set_t P;
+        P.numberOfPoints = 3;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // checking points with same x- values to see if sorted properly
+        P.points[0] = create_point(4, 20); //a
+        P.points[1] = create_point(4, 5); //b
+        P.points[2] = create_point(6, 1); //c
+
+        SLOPE_TYPE result = min_slope(&P);
+        assert(abs(-9.5-result < .0001));  
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    }  
+
+    {
+        point_set_t P;
+        P.numberOfPoints = 5;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // checking points with same x- values to see if sorted properly
+        // we know what the min_slope should be, testing if vertical points
+        // between the highest and lowest mess up sorting process
+        P.points[0] = create_point(4, 20); 
+        P.points[1] = create_point(4, 15); 
+        P.points[2] = create_point(4, 10); 
+        P.points[3] = create_point(4, 5); 
+        P.points[4] = create_point(1, 25); 
+
+        SLOPE_TYPE result = min_slope(&P);
+        assert(abs(-6.66667-result)< 0.0001);
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    } 
+
+    {
+        point_set_t P;
+        P.numberOfPoints = 8;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // checking points with same x- values to see if sorted properly
+        // we know what the min_slope should be, testing if vertical points
+        // between the highest and lowest mess up sorting process
+
+        P.points[0] = create_point(4, 5);
+        P.points[1] = create_point(4, 20); 
+        P.points[2] = create_point(5, 60);
+        P.points[3] = create_point(4, 15); 
+        P.points[4] = create_point(6, 100);
+        P.points[5] = create_point(4, 10); 
+        P.points[6] = create_point(7, 101);
+        P.points[7] = create_point(1, 25); 
+
+        SLOPE_TYPE result = min_slope(&P);
+        assert(abs(-6.66667-result)< 0.0001);
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    } 
     cout << "Finished testing min slope" << endl;
 }
 
@@ -364,17 +445,14 @@ void test_count_slopes() {
         P.numberOfPoints = 3;
         P.points = new point_t*[P.numberOfPoints];
 
-        // edge case - slopes are exactly alpha or beta
+        // edge case - slopes are exactly alpha or beta, testing if altered bounds work
         P.points[0] = create_point(2.5, 5.5);
         P.points[1] = create_point(3.5, 2.75);
         P.points[2] = create_point(4, 3);
 
-        int result = count_slopes(&P, -2.75, 0.5);
-        cout << "count_slopes result : " << result << endl;
-        // This results with the slope count being 1. I expected it to be 3, because
-        // two of the slopes are exactly alpha and beta, and the last slope is between them.
-        // So, I believe that count_slopes is excluding slopes that are exactly alpha and beta
-        //assert(result == 3);  
+        int result = count_slopes(&P, -2.75, 0.5, true);
+        // cout << "count_slopes result : " << result << endl;
+        assert(result == 3);  
 
         for (int i = 0; i < P.numberOfPoints; i++) {
             free_point(P.points[i]);
@@ -387,105 +465,150 @@ void test_count_slopes() {
 
 
 void test_display_points_v2(){
-    {
-        // edge case - empty points_to_display
-        // edge case - min_slope is greater than beta
-        // edge case - what happens when there is a lot of points thats not alpha and beta
-        // would there be a case where the random sampling does not work?
+    // {
+    //     // edge case - empty points_to_display
+    //     // edge case - min_slope is greater than beta
+    //     // edge case - what happens when there is a lot of points thats not alpha and beta
+    //     // would there be a case where the random sampling does not work?
 
-        point_set_t P;
-        P.numberOfPoints = 3;
-        P.points = new point_t*[P.numberOfPoints];
+    //     point_set_t P;
+    //     P.numberOfPoints = 3;
+    //     P.points = new point_t*[P.numberOfPoints];
 
-        // regular case 
-        P.points[0] = create_point(1, 1);
-        P.points[1] = create_point(2, 2);
-        P.points[2] = create_point(3, 3);
+    //     // regular case 
+    //     P.points[0] = create_point(1, 1);
+    //     P.points[1] = create_point(2, 2);
+    //     P.points[2] = create_point(3, 3);
 
-        double alpha = min_slope(&P);
-        point_t** points_to_display = display_points_v2(&P, 2, alpha, 10, 100);
+    //     double alpha = min_slope(&P);
+    //     point_t** points_to_display = display_points_v2(&P, 2, alpha, 10, 100);
 
-        // cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
-        // cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
+    //     // cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
+    //     // cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
 
-        // cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
-        // cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
-    }
+    //     // cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
+    //     // cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
+    // }
 
-    {
-        point_set_t P;
-        P.numberOfPoints = 3;
-        P.points = new point_t*[P.numberOfPoints];
+    // {
+    //     point_set_t P;
+    //     P.numberOfPoints = 3;
+    //     P.points = new point_t*[P.numberOfPoints];
 
-        // regular case 
-        P.points[0] = create_point(1, 3);
-        P.points[1] = create_point(2, 2);
-        P.points[2] = create_point(3, 1);
+    //     // regular case 
+    //     P.points[0] = create_point(1, 3);
+    //     P.points[1] = create_point(2, 2);
+    //     P.points[2] = create_point(3, 1);
 
-        double alpha = min_slope(&P);
-        point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 100);
+    //     double alpha = min_slope(&P);
+    //     point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 100);
 
-        // cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
-        // cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
+    //     // cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
+    //     // cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
 
-        // cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
-        // cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
+    //     // cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
+    //     // cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
 
-    }
+    // }
 
-    {
-        point_set_t P;
-        P.numberOfPoints = 5;
-        P.points = new point_t*[P.numberOfPoints];
+    // {
+    //     point_set_t P;
+    //     P.numberOfPoints = 5;
+    //     P.points = new point_t*[P.numberOfPoints];
 
-        // regular case 
-        P.points[0] = create_point(1, 2);
-        P.points[1] = create_point(3, 5);
-        P.points[2] = create_point(4, 7);
-        P.points[3] = create_point(6, 1);
-        P.points[4] = create_point(7, 3);
+    //     // regular case 
+    //     P.points[0] = create_point(1, 2);
+    //     P.points[1] = create_point(3, 5);
+    //     P.points[2] = create_point(4, 7);
+    //     P.points[3] = create_point(6, 1);
+    //     P.points[4] = create_point(7, 3);
 
-        double alpha = min_slope(&P);
-        point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 10);
+    //     double alpha = min_slope(&P);
+    //     point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 10);
 
-        // cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
-        // cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
+    //     // cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
+    //     // cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
 
-        // cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
-        // cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
+    //     // cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
+    //     // cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
 
-    }
+    // }
 
-    {
-        point_set_t P;
-        P.numberOfPoints = 5;
-        P.points = new point_t*[P.numberOfPoints];
+    // {
+    //     point_set_t P;
+    //     P.numberOfPoints = 5;
+    //     P.points = new point_t*[P.numberOfPoints];
 
-        // regular case 
-        P.points[0] = create_point(2, 3);
-        P.points[1] = create_point(5, 8);
-        P.points[2] = create_point(7, 2);
-        P.points[3] = create_point(9, 6);
-        P.points[4] = create_point(11, 10);
+    //     // regular case 
+    //     P.points[0] = create_point(2, 3);
+    //     P.points[1] = create_point(5, 8);
+    //     P.points[2] = create_point(7, 2);
+    //     P.points[3] = create_point(9, 6);
+    //     P.points[4] = create_point(11, 10);
 
-        double alpha = min_slope(&P);
-        point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 10000);
+    //     double alpha = min_slope(&P);
+    //     point_t** points_to_display = display_points_v2(&P, 2, alpha, 0, 100);
 
-        cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
-        cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
+    //     cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
+    //     cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
 
-        cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
-        cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
+    //     cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
+    //     cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
 
-    }
+    //  }
 
-    cout << "Finished testing display points test" << endl;
+    // {
+    //     point_set_t P;
+    //     P.numberOfPoints = 4;
+    //     P.points = new point_t*[P.numberOfPoints];
+
+    //     // regular case 
+    //     P.points[0] = create_point(1, 3);
+    //     P.points[1] = create_point(4, 7);
+    //     P.points[2] = create_point(6, 2);
+    //     P.points[3] = create_point(8, 9);
+
+    //     double alpha = min_slope(&P);
+    //     point_t** points_to_display = display_points_v2(&P, 2, -3, 4, 100);
+
+    //     cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
+    //     cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
+
+    //     cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
+    //     cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
+
+    // }
+
+    // {
+    //     point_set_t P;
+    //     P.numberOfPoints = 4;
+    //     P.points = new point_t*[P.numberOfPoints];
+
+    //     // regular case 
+    //     P.points[0] = create_point(1, 3);
+    //     P.points[1] = create_point(4, 7);
+    //     P.points[2] = create_point(6, 2);
+    //     P.points[3] = create_point(8, 9);
+
+    //     double alpha = min_slope(&P);
+    //     point_t** points_to_display = display_points_v2(&P, 2, -0.5, 1.5, 100);
+
+    //     cout << "Point 1 x - coordinate: " << points_to_display[0]->coord[0] << endl;
+    //     cout << "Point 1 y - coordinate: " << points_to_display[0]->coord[1] << endl;
+
+    //     cout << "Point 2 x - coordinate: " << points_to_display[1]->coord[0] << endl;
+    //     cout << "Point 2 y - coordinate: " << points_to_display[1]->coord[1] << endl;
+
+    // }
+
+    // cout << "Finished testing display points test" << endl;
 }
 
 int main() {
-    //test_min_slope();
-    //test_count_inversions();
-    //test_count_slopes();
+    test_min_slope();
+    test_count_inversions();
+    test_count_slopes();
     test_display_points_v2();
+    
     return 0;
 }

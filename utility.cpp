@@ -60,10 +60,10 @@ SLOPE_TYPE min_slope(point_set_t* P, int dim_a, int dim_i) {
     // sort points based on x-coordinate
     sort(P->points, P->points + P->numberOfPoints, compare_points_x);
     // prints out in the sorted order
-    for (int i = 0; i < P->numberOfPoints; i++) {
-            cout << "x: " << P-> points[i]->coord[dim_a]  << endl;
-            cout << "y: " << P->points[i]->coord[dim_i]  << endl << endl;
-        }
+    // for (int i = 0; i < P->numberOfPoints; i++) {
+    //         cout << "x: " << P-> points[i]->coord[0]  << endl;
+    //         cout << "y: " << P->points[i]->coord[1]  << endl << endl;
+    //     }
 
     // compute slopes of adjacent points
     SLOPE_TYPE min_slope = INF;
@@ -185,14 +185,25 @@ int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int 
 //==============================================================================================
 // count_slopes
 // Counts the number of slopes in range [alpha, beta]
+//
+// Important Note: The default parameter value "adjust" is set to false
+//
 // Parameters: 
 //      P       - input data set
 //      alpha   - lower threshold
 //      beta    - upper threshold
+//      adjust  - indicates whether to expand alpha and beta range to include the inversions
+//                happening exactly at alpha and beta by a small amount
 // Return:
 //      number of slopes in range [alpha, beta]
 //==============================================================================================
-int count_slopes(point_set_t* P, double alpha, double beta) {
+int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
+    
+    if (adjust == true){
+        alpha -= 0.0001;
+        beta += 0.0001;
+    }
+
     // sort points based on y_at_alpha value
     sort(P->points, P->points + P->numberOfPoints, Comparator_Alpha(alpha));
 
@@ -255,7 +266,13 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
     double current_slope_count;
 
     int slope_count = count_slopes(P, alpha, beta);
+    cout << "total initial slope count: " << slope_count << endl;
+
     int mid = ceil(slope_count / 2);
+    if (slope_count % 2 != 0){
+        mid++;
+    }
+
     cout << "estimate median slope count: " << mid << endl;
 
     // generate random seed based on time
@@ -276,9 +293,14 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
         // check if slope within range
         if (current_slope >= alpha && current_slope <= beta){
             
-            current_slope_count = count_slopes(P, alpha, current_slope);            
-            
-            if (abs(current_slope_count - mid) < min_difference){
+            current_slope_count = count_slopes(P, alpha, current_slope);    
+
+            if (abs(current_slope_count - mid) == 0){
+                points_to_display[0] = point1;               
+                points_to_display[1] = point2;  
+                return points_to_display;
+            }
+            else if (abs(current_slope_count - mid) < min_difference){
 
                     cout << "current estimate of median slope count: " << abs(current_slope_count - mid) << endl;
         
@@ -287,6 +309,7 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
                     points_to_display[0] = point1;               
                     points_to_display[1] = point2;  
             }
+
         }
     }
 
