@@ -78,16 +78,18 @@ SLOPE_TYPE min_slope(point_set_t* P, int dim_a, int dim_i) {
 //==============================================================================================
 // Helper function for comparison in count_slopes - y at alpha
 //==============================================================================================
-bool compare_points_alpha(const point_t& p1, const point_t& p2, double alpha) {
-    return (p1.coord[0] * alpha - p1.coord[1]) < (p2.coord[0] * alpha - p2.coord[1]);
+bool compare_points_alpha(const point_t& p1, const point_t& p2, double alpha, int dim_a, int dim_i) {
+    return (p1.coord[dim_a] * alpha - p1.coord[dim_i]) < (p2.coord[dim_a] * alpha - p2.coord[dim_i]);
 }
 
 struct Comparator_Alpha {
     double alpha;
-    Comparator_Alpha(double f) : alpha(f) {}
+    int dim_a;
+    int dim_i;
+    Comparator_Alpha(double f, int a, int i) : alpha(f), dim_a(a), dim_i(i) {}
 
     bool operator()(const point_t* p1, const point_t* p2) const {
-        return compare_points_alpha(*p1, *p2, alpha);
+        return compare_points_alpha(*p1, *p2, alpha, dim_a, dim_i);
     }
 };
 
@@ -95,16 +97,18 @@ struct Comparator_Alpha {
 // Helper function for comparison in count_slopes - y at beta
 //==============================================================================================
 
-bool compare_points_beta(const point_order_t& p1, const point_order_t& p2, double beta) {
-    return (p1.point->coord[0] * beta - p1.point->coord[1]) < (p2.point->coord[0] * beta - p2.point->coord[1]);
+bool compare_points_beta(const point_order_t& p1, const point_order_t& p2, double beta, int dim_a, int dim_i) {
+    return (p1.point->coord[dim_a] * beta - p1.point->coord[dim_i]) < (p2.point->coord[dim_a] * beta - p2.point->coord[dim_i]);
 }
 
 struct Comparator_Beta {
     double beta;
-    Comparator_Beta(double f) : beta(f) {}
+    int dim_a;
+    int dim_i;
+    Comparator_Beta(double f, int a, int i) : beta(f), dim_a(a), dim_i(i) {}
 
     bool operator()(const point_order_t& p1, const point_order_t& p2) const {
-        return compare_points_beta(p1, p2, beta);
+        return compare_points_beta(p1, p2, beta, dim_a, dim_i);
     }
 };
 
@@ -196,14 +200,14 @@ int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int 
 // Return:
 //      number of slopes in range [alpha, beta]
 //==============================================================================================
-int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
+int count_slopes(point_set_t* P, double alpha, double beta, bool adjust, int dim_a, int dim_i) {
     if (adjust == true){
         alpha -= 0.0001;
         beta += 0.0001;
     }
 
     // sort points based on y_at_alpha value
-    sort(P->points, P->points + P->numberOfPoints, Comparator_Alpha(alpha));
+    sort(P->points, P->points + P->numberOfPoints, Comparator_Alpha(alpha, dim_a, dim_i));
 
     // copy original points into vector with order
     vector<point_order_t> point_order;
@@ -216,7 +220,7 @@ int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
     }
 
     // sort points based on y_at_beta value
-    sort(point_order.begin(), point_order.end(), Comparator_Beta(beta));
+    sort(point_order.begin(), point_order.end(), Comparator_Beta(beta, dim_a, dim_i));
 
     // put order of y_at_beta into vector inverted_order
     vector<int> inverted_order;
@@ -243,7 +247,7 @@ int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
 // Return:
 //      A set of points that most evenly divides the range ratio u_i / u_x
 //==============================================================================================
-point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations) {
+point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, int num_iterations, int dim_a, int dim_i) {
     
     // edge case - when beta is smaller than the minimum
     // if (min_slope(P) > beta){
@@ -263,7 +267,7 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
     int rand_index2;
     double current_slope_count;
 
-    int slope_count = count_slopes(P, alpha, beta, true);
+    int slope_count = count_slopes(P, alpha, beta, true, dim_a, dim_i);
     cout << "total initial slope count: " << slope_count << endl;
 
     int mid = slope_count / 2;
@@ -286,12 +290,12 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
         point_t* point2 = P -> points[rand_index2];
 
         // compute slope
-        current_slope = compute_slope(point1, point2);          
+        current_slope = compute_slope(point1, point2, dim_a, dim_i);          
 
         // check if slope within range
         if (current_slope >= alpha && current_slope <= beta){
             
-            current_slope_count = count_slopes(P, alpha, current_slope, true);    
+            current_slope_count = count_slopes(P, alpha, current_slope, true, dim_a, dim_i);    
 
             if (abs(current_slope_count - mid) == 0){
                 points_to_display[0] = point1;               
@@ -325,7 +329,7 @@ point_t** display_points_v2(point_set_t* P, int s, double alpha, double beta, in
 //      slope of the most even breakpoint
 //==============================================================================================
 
-COORD_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta) {
+COORD_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i) {
     // Set up I
     point_t** points_to_display = new point_t*[s]; 
 
@@ -342,7 +346,7 @@ COORD_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     double current_slope_count;
 
     // calculate total slope between alpha and beta
-    int total_slopes = count_slopes(P, alpha, beta);
+    int total_slopes = count_slopes(P, alpha, beta, true, dim_a, dim_i);
     int mid = total_slopes / 2;
 
     // generate random seed based on time
@@ -358,12 +362,12 @@ COORD_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
         point_t* point2 = P -> points[rand_index2];
 
         // compute slope
-        current_slope = compute_slope(point1, point2);          
+        current_slope = compute_slope(point1, point2, dim_a, dim_i);          
 
         // check if slope within range
         if (current_slope >= alpha && current_slope <= beta){
             
-            current_slope_count = count_slopes(P, alpha, current_slope);            
+            current_slope_count = count_slopes(P, alpha, current_slope, true, dim_a, dim_i);            
             
             if (abs(current_slope_count - mid) < min_difference){
         
@@ -375,67 +379,9 @@ COORD_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
         }
     }
 
-    SLOPE_TYPE best_slope = compute_slope(points_to_display[0], points_to_display[1]); 
+    SLOPE_TYPE best_slope = compute_slope(points_to_display[0], points_to_display[1], dim_a, dim_i); 
 
     return best_slope;
-}
-
-//==============================================================================================
-// breakpoint_first_attempt
-// Problem:
-//      Cannot work with multiple dimesion yet, only work with 2 dimensions
-//      -> fix other functions (all slope-related is 2-d) to work with multiple dimension
-//      -> will take in a parameter to set anchor index (u_i/u_a instead of u_i/u_1) -> a replaces 1 for testing purposes
-//      Lack pre-condition checking - e.g: whether negative slopes exist, what to do when no points to display
-// Description:
-//      Simulate interaction with multiple rounds of interaction
-// Parameters: 
-//      P           - input data set
-//      u           - unknown utility vector
-//      s           - number of points to display each round
-//      maxRound    - maximum number of rounds of interactions / budget of questions
-// Return:
-//      For now, estimated utility vector
-//      Not sure yet, add in later - What is the most helpful value to return?
-//==============================================================================================
-
-point_t* breakpoint_first_attempt(point_set_t* P, point_t* u, int s, int maxRound) {
-    //Set up 
-    int dim = P->points[0]->dim;
-    point_t* estimated_u = new point_t;
-    estimated_u->dim = dim;
-
-    SLOPE_TYPE slope_breakpoint;
-    COORD_TYPE ratio_breakpoint;
-
-    double alpha = min_slope(P);
-    double beta = 0;
-
-    for (int round = 0; round < maxRound; round++) {
-        // find points that divides the range alpha beta most evenly, take that slope
-        slope_breakpoint = breakpoint_one_round(P, s, alpha, beta);
-        ratio_breakpoint = -1 / slope_breakpoint;
-        
-        // simulate user interaction
-        if (u->coord[1]/u->coord[0] < ratio_breakpoint) {
-            beta = slope_breakpoint;
-        }
-        else {
-            alpha = slope_breakpoint;
-        }
-    }
-
-    // To do: write a funtion in header file to convert slope to ratio and vice versa for cleaner code
-    // CONSIDER TAKE AVERAGE OF BREAKPOINT INSTEAD OF SLOPES
-    SLOPE_TYPE average_slope = (beta + alpha) / 2;
-    COORD_TYPE estimated_ratio = - 1 /average_slope;
-
-    // Modify estimated_u - This is currently a bad way to do it
-    estimated_u->coord = new double[2];
-    estimated_u->coord[0] = 1;
-    estimated_u->coord[1] = estimated_ratio;
-
-    return estimated_u;
 }
 
 //==============================================================================================
@@ -469,7 +415,7 @@ double max_utility_breakpoint(point_set_t* P, int a, point_t* u, int s,  double 
     // Find min slope of each dimension
     for (int i = 0; i < dim; i++) {
         // Call min slope, now with dimension i and a
-        min_slope(P);
+        min_slope(P, a, i);
     }
 
 
