@@ -466,10 +466,22 @@ double max_utility_breakpoint(point_set_t* P, int a, point_t* u, int s,  double 
     int dim = P->points[0]->dim;
     vector<double> L, H;
 
-    // Find min slope of each dimension
+    // Find min slope of each dimension, figure out how to exclude dimension a
     for (int i = 0; i < dim; i++) {
-        // Call min slope, now with dimension i and a
-        min_slope(P);
+        L.push_back(min_slope(P, a, i));
+        H.push_back(0);
+    }
+
+    int i = 0;
+    while (true) {
+    // In maxUtility, the looping condition will be while (QCount < maxRound)
+        if (i == a) {
+            i = (i % dim) + 1;
+        }
+        vector<double> B;
+        for (int j = 0; j < s - 1; j++) {
+            B.push_back(j * bi / s);
+        }
     }
 
 
