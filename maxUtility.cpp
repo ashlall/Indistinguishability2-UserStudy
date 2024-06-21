@@ -1341,6 +1341,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
     double beta = 0;
 
     while(Qcount < maxRound) {
+		Qcount++;
         // find points that divides the range alpha beta most evenly, take that slope
         slope_breakpoint = breakpoint_one_round(P, s, alpha, beta);
         ratio_breakpoint = slope_to_ratio(slope_breakpoint);
