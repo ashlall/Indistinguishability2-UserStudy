@@ -358,7 +358,7 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
 	      avg_alpha[MIN_R][q] += alpha/REPEATS;
 
-        alpha= max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+        alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
         avg_alpha[BREAKPOINT][q] += alpha/REPEATS;
 	    }
 

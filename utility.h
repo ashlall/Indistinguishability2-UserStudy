@@ -8,7 +8,10 @@
 #include <cmath>
 #include <cassert>
 #include <vector>
+#include <time.h> 
+#include <iostream>
 
+#include "operation.h"
 #include "rtree.h"
 #include "lp.h"
 #include "pruning.h"

@@ -1,6 +1,4 @@
 #include "utility.h"
-#include <time.h> 
-#include <iostream>
 
 //==============================================================================================
 // Helper function slope_to_ratio
@@ -63,11 +61,6 @@ SLOPE_TYPE min_slope(point_set_t* P) {
 
     // sort points based on x-coordinate
     sort(P->points, P->points + P->numberOfPoints, compare_points_x);
-    // prints out in the sorted order
-    for (int i = 0; i < P->numberOfPoints; i++) {
-            cout << "x: " << P-> points[i]->coord[0]  << endl;
-            cout << "y: " << P->points[i]->coord[1]  << endl << endl;
-        }
 
     // compute slopes of adjacent points
     SLOPE_TYPE min_slope = INF;
@@ -258,7 +251,7 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     int current_slope_count;        
     double min_difference = INF;
 
-    for (int i = 0; i < 100; i++){
+    for (int i = 0; i < 2; i++){
         // generate random set of points
         for (int i = 0; i < s; i++) {
             S[i] = P -> points[rand() % P -> numberOfPoints];
@@ -272,7 +265,7 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
             
             current_slope_count = count_slopes(P, alpha, current_slope, true);       
 
-            if (abs(current_slope_count == mid)){
+            if (current_slope_count == mid){
                 return mid;
             }
             else if (abs(current_slope_count - mid) < min_difference){
@@ -288,127 +281,4 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     SLOPE_TYPE best_slope = compute_slope(S_best[0], S_best[1]); 
 
     return best_slope;
-}
-
-
-//==============================================================================================
-// max_utility_breakpoint
-// Description:
-//      Simulate interaction with multiple rounds of interaction and 2-dimensional tuples
-//      2 dimensions and s = 2
-// Parameters: 
-//      P           - input data set
-//      u           - unknown utility vector
-//      s           - number of points to display each round
-//      maxRound    - maximum number of rounds of interactions / budget of questions
-// Return:
-//      alpha       - approximation
-//==============================================================================================
-
-double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
-
-    // set of candidate tuples
-    vector<int> C_idx;
-    for(int i = 0; i < P->numberOfPoints; i++) {
-        C_idx.push_back(i); 
-    }
-
-    // set up 
-    int dim = P->points[0]->dim;
-    point_t* estimated_u = new point_t;
-    estimated_u->dim = dim;
-
-    SLOPE_TYPE slope_breakpoint;
-    COORD_TYPE ratio_breakpoint;
-
-    double alpha = min_slope(P);
-    double beta = 0;
-
-    while(Qcount < maxRound) {
-        // find points that divides the range alpha beta most evenly, take that slope
-        slope_breakpoint = breakpoint_one_round(P, s, alpha, beta);
-        ratio_breakpoint = slope_to_ratio(slope_breakpoint);
-        
-        // simulate user interaction, update alpha and beta
-        if (u->coord[1]/u->coord[0] < ratio_breakpoint) {
-            beta = slope_breakpoint;
-        }
-        else {
-            alpha = slope_breakpoint;
-        }
-    }
-
-    COORD_TYPE ratio_alpha = slope_to_ratio(alpha);
-    COORD_TYPE ratio_beta = slope_to_ratio(beta);
-    COORD_TYPE estimated_ratio = (ratio_alpha + ratio_beta) / 2;
-
-    // This should be in the beginning, but leave this here for the purpose of s = 2
-    vector<double> L(dim), H(dim);
-
-    L.push_back(1);
-    L.push_back(ratio_alpha);
-
-    H.push_back(1);
-    H.push_back(ratio_beta);
-
-    // find the highest value from the low-end of the user utilities
-    double highest = 0.0;
-    for (int j = 0; j < P->numberOfPoints; ++j)
-    {
-        double dot = 0.0;
-        for(int k = 0; k < dim; ++k)
-        dot += P->points[j]->coord[k] * L[k];
-        if (dot > highest)
-        highest = dot;
-    }
-
-    // prune all the points that have their high-end utility (1+epsilon) dominated
-    C_idx.clear();
-    for (int j = 0; j < P->numberOfPoints; ++j)
-    {
-        double dot = 0.0;
-        for(int k = 0; k < dim; ++k)
-        dot += P->points[j]->coord[k] * H[k];
-        if (dot * (1 + epsilon) >= highest)
-        C_idx.push_back(j);
-    }
-
-    // Find out how well this did:
-    double max_value = 0;
-    for(int i = 0; i < P->numberOfPoints; i++)
-    {
-        double value = dot_prod(u, P->points[i]);
-        if(value > max_value)
-        max_value = value;
-    }
-
-    int inI = 0;
-    double alpha_approx = 0.0;
-    double avg_effective_epsilon = 0.0, max_effective_epsilon = 0.0;
-    for(int i = 0; i < C_idx.size(); i++)
-        {
-        double value = dot_prod(u, P->points[C_idx[i]]);
-        if(value * (1 + epsilon) > max_value)
-        inI++;
-        else
-        {
-        avg_effective_epsilon += max_value/value - 1.0;
-        if (max_value/value - 1.0 > max_effective_epsilon)
-            max_effective_epsilon = max_value/value - 1.0;
-
-        if (max_value - value * (1 + epsilon) > alpha_approx)
-            alpha_approx = max_value - value * (1 + epsilon);
-        }
-        }
-    if (C_idx.size() - inI > 0)
-        avg_effective_epsilon /= C_idx.size() - inI;
-    printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
-    Csize = C_idx.size();
-
-    return alpha_approx;
-}
-
-int main (void) {
-    // ADD CODE HERE TO DEBUG MAX_UTILITY_BREAKPOINT
-    return 0;
 }

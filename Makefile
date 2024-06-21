@@ -8,7 +8,7 @@ gdb:
 	g++ -g -w *.c *.cpp -lglpk -lm -o run
 
 utility:
-	g++ -w utility.cpp test_utility.cpp -lglpk -lm -Ofast -o run_utility
+	g++ -w test_utility.cpp utility.cpp data_utility.cpp -lglpk -lm -Ofast -o run_utility
 
 clean:
 	rm run
