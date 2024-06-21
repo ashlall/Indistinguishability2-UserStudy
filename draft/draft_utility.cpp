@@ -8,6 +8,22 @@ using namespace std;
 #include <iostream>
 
 //==============================================================================================
+//	Calculate the dot product between two points
+//==============================================================================================
+double dot_prod(point_t* point_v1, point_t* point_v2)
+{
+	int dim = point_v1->dim;
+	double result = 0;
+
+	int i;
+	for(i = 0; i < dim; i++)
+	{
+		result += point_v1->coord[i]*point_v2->coord[i];
+	}
+	return result;
+}
+
+//==============================================================================================
 // Helper function slope_to_ratio
 //==============================================================================================
 COORD_TYPE slope_to_ratio   (SLOPE_TYPE s) {
@@ -860,7 +876,21 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
 //      alpha       - approximation
 //==============================================================================================
 
-double breakpoint_2d(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
+//==============================================================================================
+// max_utility_breakpoint
+// Description:
+//      Simulate interaction with multiple rounds of interaction and 2-dimensional tuples
+//      2 dimensions and s = 2
+// Parameters: 
+//      P           - input data set
+//      u           - unknown utility vector
+//      s           - number of points to display each round
+//      maxRound    - maximum number of rounds of interactions / budget of questions
+// Return:
+//      alpha       - approximation
+//==============================================================================================
+
+double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
 
     // set of candidate tuples
     vector<int> C_idx;
@@ -876,10 +906,11 @@ double breakpoint_2d(point_set_t* P, point_t* u, int s,  double epsilon, double 
     SLOPE_TYPE slope_breakpoint;
     COORD_TYPE ratio_breakpoint;
 
-    double alpha = min_slope(P, 0, 1);
+    double alpha = min_slope(P);
     double beta = 0;
 
-    for (int round = 0; round < maxRound; round++) {
+    while(Qcount < maxRound) {
+        Qcount++;
         // find points that divides the range alpha beta most evenly, take that slope
         slope_breakpoint = breakpoint_one_round(P, s, alpha, beta);
         ratio_breakpoint = slope_to_ratio(slope_breakpoint);
@@ -939,7 +970,6 @@ double breakpoint_2d(point_set_t* P, point_t* u, int s,  double epsilon, double 
 
     int inI = 0;
     double alpha_approx = 0.0;
-    double avg_effective_epsilon = 0.0, max_effective_epsilon = 0.0;
     for(int i = 0; i < C_idx.size(); i++)
         {
         double value = dot_prod(u, P->points[C_idx[i]]);
@@ -947,19 +977,15 @@ double breakpoint_2d(point_set_t* P, point_t* u, int s,  double epsilon, double 
         inI++;
         else
         {
-        avg_effective_epsilon += max_value/value - 1.0;
-        if (max_value/value - 1.0 > max_effective_epsilon)
-            max_effective_epsilon = max_value/value - 1.0;
-
         if (max_value - value * (1 + epsilon) > alpha_approx)
             alpha_approx = max_value - value * (1 + epsilon);
         }
         }
-    if (C_idx.size() - inI > 0)
-        avg_effective_epsilon /= C_idx.size() - inI;
-    printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
+    printf("Found %d in I; %d false positives; alpha was %lf\n", inI, int(C_idx.size()) - inI, alpha);
     Csize = C_idx.size();
 
     return alpha_approx;
 }
+
+
 

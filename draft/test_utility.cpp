@@ -1,7 +1,6 @@
 // this file includes unit tests for functions written in utility.cpp
 
 #include "utility.h"
-#include <cassert>
 
 // helper function to create a point
 point_t* create_point(double x, double y) {
@@ -604,11 +603,56 @@ void test_display_points_v2(){
     // cout << "Finished testing display points test" << endl;
 }
 
+void test_max_utility_breakpoint() {
+    {
+        point_set_t P;
+        P.numberOfPoints = 3;
+        P.points = new point_t*[P.numberOfPoints];
+
+        // regular case
+        P.points[0] = create_point(1, 1);
+        P.points[1] = create_point(3, 3);
+        P.points[2] = create_point(2, 2);
+
+        SLOPE_TYPE result = min_slope(&P);
+        assert(result == 1.0);  
+
+        for (int i = 0; i < P.numberOfPoints; i++) {
+            free_point(P.points[i]);
+        }
+        delete[] P.points;
+    }
+
+    {
+        // INSERT DEBUGGING CODE HERE
+        int s = 2;
+        double epsilon = 0.01, delta;
+        int q = 20;                // maximum number of rounds to run for
+        int Qcount, Csize;
+        int dim = 2;
+
+        point_t* u = alloc_point(dim);
+
+        point_set_t P;
+        P.numberOfPoints = 6;
+        P.points = new point_t*[P.numberOfPoints];
+        P.points[0] = create_point(0.819589, 0.086244);
+        P.points[1] = create_point(0.818670, 0.093673);
+        P.points[2] = create_point(0.802900, 0.086615);
+        P.points[3] = create_point(0.829428, 0.070384);
+        P.points[4] = create_point(0.823352, 0.098616);
+        P.points[5] = create_point(0.815172, 0.079420);
+
+
+        max_utility_breakpoint(&P, u, s,  epsilon, delta, q, Qcount, Csize);
+    }
+}
+
 int main() {
-    test_min_slope();
-    test_count_inversions();
-    test_count_slopes();
-    test_display_points_v2();
-    
+    // test_min_slope();
+    // test_count_inversions();
+    // test_count_slopes();
+    // test_display_points_v2();
+    test_max_utility_breakpoint();    
     return 0;
 }
