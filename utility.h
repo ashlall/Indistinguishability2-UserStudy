@@ -7,6 +7,13 @@
 #include <algorithm> 
 #include <cmath>
 #include <cassert>
+#include <vector>
+
+#include "rtree.h"
+#include "lp.h"
+#include "pruning.h"
+#include "utility.h"
+#include <queue>
 
 #define SLOPE_TYPE          double
 
@@ -19,13 +26,15 @@ typedef struct point_order
 
 using namespace std;
 
-SLOPE_TYPE              compute_slope           (point_t* p1, point_t* p2, int dim_a, int dim_i);
-SLOPE_TYPE              min_slope               (point_set_t* P, int dim_a, int dim_i);
+COORD_TYPE              slope_to_ratio          (SLOPE_TYPE s);
+COORD_TYPE              ratio_to_slope          (COORD_TYPE r);
+SLOPE_TYPE              compute_slope           (point_t* p1, point_t* p2);
+SLOPE_TYPE              min_slope               (point_set_t* P);
 int                     count_inversions        (vector<int>& arr);
-int                     count_slopes            (point_set_t* P, double alpha, double beta, bool adjust = false, int dim_a, int dim_i);
+int                     count_slopes            (point_set_t* P, double alpha, double beta, bool adjust = false);
 point_t**               display_points_v2       (point_set_t* P, int s, double alpha, double beta, int num_iterations);
 COORD_TYPE              breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta);
-point_t*                breakpoint_first_attempt(point_set_t* P, point_t* u, int s, int maxRound, int a);
+double                  breakpoint_2d           (point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 double                  max_utility_breakpoint  (point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 
 

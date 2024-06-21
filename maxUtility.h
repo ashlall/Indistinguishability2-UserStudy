@@ -11,6 +11,7 @@
 #include "rtree.h"
 #include "lp.h"
 #include "pruning.h"
+#include "utility.h"
 #include <queue>
 
 #define RANDOM 1
@@ -40,5 +41,8 @@ double max_utility_fake(point_set_t* P, point_t* u, int s,  double epsilon, doub
 
 // random algorithm for fake points
 double random_fake(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
+
+// the main interactive breakpoint algorithm for real points
+double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 
 #endif
