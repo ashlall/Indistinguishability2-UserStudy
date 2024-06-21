@@ -220,9 +220,9 @@ void run_vary_s(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100];
+  double alpha, avg_alpha[5][100];
   int REPEATS = 10; // number of times to repeat experiment
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   int MIN_S = 2, MAX_S = 10; // MAX_S < 100
   int reps = 10; // number of times needed my MinR and MinC
   
@@ -233,6 +233,7 @@ void run_vary_s(point_set_t* P, point_set_t* cskyline, double epsilon, double de
     avg_alpha[UHRAND][s] = 0.0;
     avg_alpha[MIN_D][s] = 0.0;
     avg_alpha[MIN_R][s] = 0.0;
+    avg_alpha[Breakpoint][s] = 0.0;
 
     for(int repeat = 0; repeat < REPEATS; ++repeat)
     {
@@ -271,20 +272,23 @@ void run_vary_s(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
       if (fake)
       {	
-	alpha = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
-	avg_alpha[SQUEEZEU][s] += alpha/REPEATS;
+	      alpha = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+	      avg_alpha[SQUEEZEU][s] += alpha/REPEATS;
       }
 
       if (real)
       {
-	alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
+	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
         avg_alpha[UHRAND][s] += alpha/REPEATS;
 
-	alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
-	avg_alpha[MIN_D][s] += alpha/REPEATS;
+	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
+	      avg_alpha[MIN_D][s] += alpha/REPEATS;
 
-	alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
+	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
         avg_alpha[MIN_R][s] += alpha/REPEATS;
+
+        alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+        avg_alpha[Breakpoint][s] += alpha/REPEATS;  
       }
 
     }
@@ -296,8 +300,8 @@ void run_vary_s(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
   for(s = MIN_S; s <= MAX_S; s += 2)
   {
-    printf("%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s]);
-    fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s]);
+    printf("%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+    fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
   }
   fclose(fp);
 
@@ -386,9 +390,9 @@ void run_fix_totalshown(point_set_t* P, point_set_t* cskyline, double epsilon, d
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100];
+  double alpha, avg_alpha[5][100];
   int REPEATS = 10; // number of times to repeat experiment
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   int MIN_S = 2, MAX_S = 6; // MAX < 100
   int reps = 10; // number of times needed my MinR and MinC
   int total_points = 24;
@@ -402,6 +406,7 @@ void run_fix_totalshown(point_set_t* P, point_set_t* cskyline, double epsilon, d
       avg_alpha[UHRAND][s] = 0.0;
       avg_alpha[MIN_D][s] = 0.0;
       avg_alpha[MIN_R][s] = 0.0;
+      avg_alpha[Breakpoint][s] = 0.0;
 
       for(int repeat = 0; repeat < REPEATS; ++repeat)
         {
@@ -432,6 +437,9 @@ void run_fix_totalshown(point_set_t* P, point_set_t* cskyline, double epsilon, d
 
               alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
               avg_alpha[MIN_R][s] += alpha/REPEATS;
+
+              alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+              avg_alpha[Breakpoint][s] += alpha/REPEATS;
             }
 
         }
@@ -443,8 +451,8 @@ void run_fix_totalshown(point_set_t* P, point_set_t* cskyline, double epsilon, d
 
   for(s = MIN_S; s <= MAX_S; s += 1)
     {
-      printf("%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
     }
   fclose(fp);
 }
@@ -458,9 +466,9 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100];
+  double alpha, avg_alpha[5][100];
   int REPEATS = 10, reps = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   double MIN_E = 0.001, FACTOR_E = 10;
 
   epsilon = MIN_E;
@@ -471,6 +479,7 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
     avg_alpha[UHRAND][i] = 0.0;
     avg_alpha[MIN_D][i] = 0.0;
     avg_alpha[MIN_R][i] = 0.0;
+    avg_alpha[Breakpoint][i] = 0.0;
 
     for(int repeat = 0; repeat < REPEATS; ++repeat)
       {
@@ -501,6 +510,10 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
 
 	    alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
 	    avg_alpha[MIN_R][i] += alpha/REPEATS;
+
+      alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+      avg_alpha[Breakpoint][s] += alpha/REPEATS;
+
 	  }
 
       }
@@ -515,8 +528,8 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
   epsilon = MIN_E;
   for(int i = 0; i < 3; ++i)
     {
-      printf("%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i]);
-      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i]);
+      printf("%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
+      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
       epsilon *= FACTOR_E;
     }
   fclose(fp);
@@ -531,9 +544,9 @@ void run_vary_delta(point_set_t* P, point_set_t* cskyline, double epsilon, doubl
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100];
+  double alpha, avg_alpha[5][100];
   int REPEATS = 10, reps = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   double MIN_DELTA = 0.001, FACTOR_DELTA = 10;
 
   delta = MIN_DELTA;
@@ -544,8 +557,9 @@ void run_vary_delta(point_set_t* P, point_set_t* cskyline, double epsilon, doubl
       avg_alpha[UHRAND][i] = 0.0;
       avg_alpha[MIN_D][i] = 0.0;
       avg_alpha[MIN_R][i] = 0.0;
+      avg_alpha[Breakpoint][i] = 0.0;
 
-      for(int repeat = 0; repeat < REPEATS; ++repeat)
+      for (int repeat = 0; repeat < REPEATS; ++repeat)
 	{
 	  // generate a random utility function and make the max equal to 1
 	  point_t* u = alloc_point(dim);
@@ -574,6 +588,9 @@ void run_vary_delta(point_set_t* P, point_set_t* cskyline, double epsilon, doubl
 
 	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
 	      avg_alpha[MIN_R][i] += alpha/REPEATS;
+
+        alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+        avg_alpha[Breakpoint][s] += alpha/REPEATS;
 	    }
 	}
       
@@ -587,8 +604,8 @@ void run_vary_delta(point_set_t* P, point_set_t* cskyline, double epsilon, doubl
   delta = MIN_DELTA;
   for(int i = 0; i < 3; ++i)
     {
-      printf("%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i]);
-      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i]);
+      printf("%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
+      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
       delta *= FACTOR_DELTA;
     }
   fclose(fp);
@@ -603,9 +620,9 @@ void run_vary_epsilon_delta(point_set_t* P, point_set_t* cskyline, double epsilo
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100];
+  double alpha, avg_alpha[5][100];
   int REPEATS = 10, reps = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   double MIN_DELTA = 0.001, FACTOR_DELTA = 10;
   
   delta = MIN_DELTA;
@@ -617,6 +634,7 @@ void run_vary_epsilon_delta(point_set_t* P, point_set_t* cskyline, double epsilo
     avg_alpha[UHRAND][i] = 0.0;
     avg_alpha[MIN_D][i] = 0.0;
     avg_alpha[MIN_R][i] = 0.0;
+    avg_alpha[Breakpoint][i] = 0.0;
     
     for(int repeat = 0; repeat < REPEATS; ++repeat)
       {
@@ -639,14 +657,18 @@ void run_vary_epsilon_delta(point_set_t* P, point_set_t* cskyline, double epsilo
 	
 	if (real)
 	  {	  
-            alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
-            avg_alpha[UHRAND][i] += alpha/REPEATS;
+      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
+      avg_alpha[UHRAND][i] += alpha/REPEATS;
 
 	    alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
 	    avg_alpha[MIN_D][i] += alpha/REPEATS;
 	    
 	    alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
 	    avg_alpha[MIN_R][i] += alpha/REPEATS;
+
+      alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+      avg_alpha[Breakpoint][s] += alpha/REPEATS;
+
 	  }
       }
     
@@ -660,8 +682,8 @@ void run_vary_epsilon_delta(point_set_t* P, point_set_t* cskyline, double epsilo
   delta = MIN_DELTA;
   for(int i = 0; i < 3; ++i)
     {
-      printf("%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i]);
-      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i]);
+      printf("%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
+      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", delta, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
       delta *= FACTOR_DELTA;
     }
     fclose(fp);
@@ -676,9 +698,9 @@ void run_false_positives(point_set_t* P, point_set_t* cskyline, double epsilon, 
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, C_size[5];
+  double alpha, C_size[6];
   int REPEATS = 10, reps = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, REAL = 4;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4, REAL = 5;
   
   for(int i = 0; i < 5; ++i) 
     C_size[i] = 0.0;
@@ -698,20 +720,24 @@ void run_false_positives(point_set_t* P, point_set_t* cskyline, double epsilon, 
 
     if (fake)
       {
-	alpha = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
-	C_size[SQUEEZEU] += ((double)Csize)/REPEATS;
+	      alpha = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+	      C_size[SQUEEZEU] += ((double)Csize)/REPEATS;
       }
 
     if (real)
       {
-	alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
+	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
         C_size[UHRAND] += ((double)Csize)/REPEATS;
 
-	alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
-	C_size[MIN_D] += ((double)Csize)/REPEATS;
+	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
+	      C_size[MIN_D] += ((double)Csize)/REPEATS;
 
-	alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
-	C_size[MIN_R] += ((double)Csize)/REPEATS;
+	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
+	      C_size[MIN_R] += ((double)Csize)/REPEATS;
+
+        alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+        C_size[Breakpoint] += ((double)Csize)/REPEATS;
+
       } 
 
 
@@ -744,8 +770,8 @@ void run_false_positives(point_set_t* P, point_set_t* cskyline, double epsilon, 
   char filename[200];
   sprintf(filename, "output/fp-%d-%d-e%lf-d%lf-q%d-s%d-%d.dat", dim, P->numberOfPoints, epsilon, delta, q, s, time(NULL));
   FILE* fp = fopen(filename, "w");
-  printf("%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[REAL]);
-  fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[REAL]);
+  printf("%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[Breakpoint], C_size[REAL]);
+  fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[Breakpoint], C_size[REAL]);
   fclose(fp);
 }
 
@@ -761,7 +787,7 @@ void run_time(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
   int cmp_option;
   double alpha, t[5];
   int REPEATS = 10, reps = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   using namespace std::chrono;
   high_resolution_clock::time_point start, finish;
   double elapsed_time;
@@ -795,10 +821,10 @@ void run_time(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
       if (real)
 	{
 	  start = high_resolution_clock::now();
-          alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
-          finish = high_resolution_clock::now();
-          elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
-          t[UHRAND] += elapsed_time/REPEATS;
+    alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
+    finish = high_resolution_clock::now();
+    elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
+    t[UHRAND] += elapsed_time/REPEATS;
 
 	  start = high_resolution_clock::now();
 	  alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
@@ -811,14 +837,21 @@ void run_time(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
 	  finish = high_resolution_clock::now();
 	  elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
 	  t[MIN_R] += elapsed_time/REPEATS;
+
+    start = high_resolution_clock::now();
+    alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+	  finish = high_resolution_clock::now();
+	  elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
+	  t[Breakpoint] += elapsed_time/REPEATS;
+
 	}
     }
 
   char filename[200];
   sprintf(filename, "output/time-%d-%d-e%lf-d%lf-q%d-s%d-%d.dat", dim, P->numberOfPoints, epsilon, delta, q, s, time(NULL));
   FILE* fp = fopen(filename, "w");
-  printf("%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R]);
-  fprintf(fp, "%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R]);
+  printf("%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R], t[Breakpoint]);
+  fprintf(fp, "%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R], t[Breakpoint]);
   fclose(fp);
 }
 
@@ -832,9 +865,9 @@ void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100];
+  double alpha, avg_alpha[5][100];
   int REPEATS = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   int MIN_T = 10, MAX_T = 100; // MAX_S < 100
 
   for(int T = MIN_T; T <= MAX_T; T += 20)
@@ -886,9 +919,9 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100], t[4][100];
+  double alpha, avg_alpha[5][100], t[5][100];
   int REPEATS = 10, reps = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   int MIN_n = 1000, MAX_n = 1000000, FACTOR_n = 10;
   char filename[256];
   int n = MIN_n, dim = 3;
@@ -930,6 +963,7 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
     avg_alpha[UHRAND][i] = 0.0;
     avg_alpha[MIN_D][i] = 0.0;
     avg_alpha[MIN_R][i] = 0.0;
+    avg_alpha[Breakpoint][i] = 0.0;
 
     for(int repeat = 0; repeat < REPEATS; ++repeat)
       {
@@ -946,36 +980,43 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
 
         if (fake)
           {
-	    start = high_resolution_clock::now();
+	          start = high_resolution_clock::now();
             alpha = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
             avg_alpha[SQUEEZEU][i] += alpha/REPEATS;
-	    finish = high_resolution_clock::now();
+	          finish = high_resolution_clock::now();
             elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
             t[SQUEEZEU][i] += elapsed_time/REPEATS;
           }
 
         if (real)
           {
-	    start = high_resolution_clock::now();
+	          start = high_resolution_clock::now();
             alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
             avg_alpha[UHRAND][i] += alpha/REPEATS;
             finish = high_resolution_clock::now();
             elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
             t[UHRAND][i] += elapsed_time/REPEATS;
 
-	    start = high_resolution_clock::now();
+	          start = high_resolution_clock::now();
             alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
             avg_alpha[MIN_D][i] += alpha/REPEATS;
-	    finish = high_resolution_clock::now();
+	          finish = high_resolution_clock::now();
             elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
             t[MIN_D][i] += elapsed_time/REPEATS;
 
-	    start = high_resolution_clock::now();
+	          start = high_resolution_clock::now();
             alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
             avg_alpha[MIN_R][i] += alpha/REPEATS;
-	    finish = high_resolution_clock::now();
+	          finish = high_resolution_clock::now();
             elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
             t[MIN_R][i] += elapsed_time/REPEATS;
+            
+            start = high_resolution_clock::now();
+            alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+            avg_alpha[Breakpoint][i] += alpha/REPEATS;
+	          finish = high_resolution_clock::now();
+            elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
+            t[Breakpoint][i] += elapsed_time/REPEATS;
           }
       }
 
@@ -991,8 +1032,8 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
   n = MIN_n;
   for(int i = 0; i < 4; ++i)
     {
-      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
       n *= FACTOR_n;
     }
   fclose(fp);
@@ -1008,9 +1049,9 @@ void run_vary_d(double epsilon, double delta, int s, int q, bool real, bool fake
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[4][100], t[4][100];
+  double alpha, avg_alpha[5][100], t[5][100];
   int REPEATS = 10, reps = 10;
-  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3;
+  int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   int MIN_dim = 2, MAX_dim = 6;
   char filename[256];
   int dim = MIN_dim, n = 10000;
@@ -1050,6 +1091,7 @@ void run_vary_d(double epsilon, double delta, int s, int q, bool real, bool fake
       avg_alpha[UHRAND][i] = 0.0;
       avg_alpha[MIN_D][i] = 0.0;
       avg_alpha[MIN_R][i] = 0.0;
+      avg_alpha[Breakpoint][i] = 0.0;
 
       for(int repeat = 0; repeat < REPEATS; ++repeat)
 	{
@@ -1077,11 +1119,11 @@ void run_vary_d(double epsilon, double delta, int s, int q, bool real, bool fake
 	  if (real)
 	    {
 	      start = high_resolution_clock::now();
-              alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
-              avg_alpha[UHRAND][i] += alpha/REPEATS;
-              finish = high_resolution_clock::now();
-              elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
-              t[UHRAND][i] += elapsed_time/REPEATS;
+        alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
+        avg_alpha[UHRAND][i] += alpha/REPEATS;
+        finish = high_resolution_clock::now();
+        elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
+        t[UHRAND][i] += elapsed_time/REPEATS;
 
 	      start = high_resolution_clock::now();
 	      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
@@ -1096,6 +1138,13 @@ void run_vary_d(double epsilon, double delta, int s, int q, bool real, bool fake
 	      finish = high_resolution_clock::now();
 	      elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
 	      t[MIN_R][i] += elapsed_time/REPEATS;
+
+        start = high_resolution_clock::now();
+        alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+        avg_alpha[Breakpoint][i] += alpha/REPEATS;
+        finish = high_resolution_clock::now();
+        elapsed_time = (duration_cast<duration<double> >(finish - start)).count();
+        t[Breakpoint][i] += elapsed_time/REPEATS;
 	    }
 	}
 
@@ -1111,8 +1160,8 @@ void run_vary_d(double epsilon, double delta, int s, int q, bool real, bool fake
   dim = MIN_dim;
   for(int i = 0; i < 5; ++i)
     {
-      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", dim, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", dim, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", dim, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", dim, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
       dim += 1;
     }
   fclose(fp);
