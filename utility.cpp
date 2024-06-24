@@ -2,7 +2,7 @@
 // chloe comment see if gitpush works
 // chloe push2
 
-// comment to be deleted
+// comment to be deleted, another one please
 
 //==============================================================================================
 // Helper function slope_to_ratio
@@ -288,3 +288,4 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
 }
 
 // This is just a comment to test if pushing works
+// this is push for testing for global config
