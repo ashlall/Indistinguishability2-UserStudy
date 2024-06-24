@@ -361,7 +361,6 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
         alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
         avg_alpha[BREAKPOINT][q] += alpha/REPEATS;
 	    }
-
 	}
     }
 
@@ -371,8 +370,8 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
   for(q = MIN_Q; q <= MAX_Q; q += 2)
     {
-      printf("%d\t%lf\t%lf\t%lf\t%lf\n", q, avg_alpha[SQUEEZEU][q], avg_alpha[UHRAND][q], avg_alpha[MIN_D][q], avg_alpha[MIN_R][q], avg_alpha[BREAKPOINT][q]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", q, avg_alpha[SQUEEZEU][q], avg_alpha[UHRAND][q], avg_alpha[MIN_D][q], avg_alpha[MIN_R][q], avg_alpha[BREAKPOINT][q]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", q, avg_alpha[SQUEEZEU][q], avg_alpha[UHRAND][q], avg_alpha[MIN_D][q], avg_alpha[MIN_R][q], avg_alpha[BREAKPOINT][q]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", q, avg_alpha[SQUEEZEU][q], avg_alpha[UHRAND][q], avg_alpha[MIN_D][q], avg_alpha[MIN_R][q], avg_alpha[BREAKPOINT][q]);
     }
   fclose(fp);
 }
