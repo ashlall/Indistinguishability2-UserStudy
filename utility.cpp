@@ -1,17 +1,22 @@
 #include "utility.h"
+// chloe comment see if gitpush works
+// hellooooo
+// YAYYY
+
+// comment to be deleted, another one please. hihi
 
 //==============================================================================================
 // Helper function slope_to_ratio
 //==============================================================================================
 COORD_TYPE slope_to_ratio   (SLOPE_TYPE s) {
-    return -1/s;
+    return (-1/s);
 }
 
 //==============================================================================================
 // Helper function ratio_to_slope
 //==============================================================================================
 COORD_TYPE ratio_to_slope   (COORD_TYPE r) {
-    return -1/r;
+    return (-1/r);
 }
 
 //==============================================================================================
@@ -282,3 +287,6 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
 
     return best_slope;
 }
+
+// This is just a comment to test if pushing works
+// this is push for testing for global config

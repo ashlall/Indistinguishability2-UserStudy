@@ -1355,18 +1355,21 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         }
     }
 
-    COORD_TYPE ratio_alpha = slope_to_ratio(alpha);
-    COORD_TYPE ratio_beta = slope_to_ratio(beta);
+    COORD_TYPE ratio_alpha = -1/alpha;
+    COORD_TYPE ratio_beta = -1/beta;
     COORD_TYPE estimated_ratio = (ratio_alpha + ratio_beta) / 2;
 
     // This should be in the beginning, but leave this here for the purpose of s = 2
-    vector<double> L(dim), H(dim);
+    vector<double> L, H;
 
     L.push_back(1);
     L.push_back(ratio_alpha);
 
     H.push_back(1);
     H.push_back(ratio_beta);
+
+	cout << "L: " << L[1] << endl;
+	cout << "H: " << H[1] << endl;
 
     // find the highest value from the low-end of the user utilities
     double highest = 0.0;
@@ -1421,6 +1424,8 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         avg_effective_epsilon /= C_idx.size() - inI;
     printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
     Csize = C_idx.size();
+
+
 
     return alpha_approx;
 }
