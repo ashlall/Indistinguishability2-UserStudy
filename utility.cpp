@@ -1,9 +1,4 @@
 #include "utility.h"
-// chloe comment see if gitpush works
-// hellooooo
-// YAYYY
-
-// comment to be deleted, another one please. hihi
 
 //==============================================================================================
 // Helper function slope_to_ratio
@@ -249,17 +244,20 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     }
     
     // sampling set up
+    bool found_best = false;
     point_t* S[s];   
     point_t* S_best[s];
+
     srand (time(NULL));
     SLOPE_TYPE current_slope;
     int current_slope_count;        
     double min_difference = INF;
+    SLOPE_TYPE best_slope;
 
-    for (int i = 0; i < 2; i++){
+    for (int i = 0; i < 100; i++){
         // generate random set of points
         for (int i = 0; i < s; i++) {
-            S[i] = P -> points[rand() % P -> numberOfPoints];
+            S[i] = P -> points[rand() % (P -> numberOfPoints)];
         }
 
         // compute slope of this set, for now s = 2
@@ -267,14 +265,17 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
 
         // check if slope within range
         if (current_slope >= alpha && current_slope <= beta){
-            
-            current_slope_count = count_slopes(P, alpha, current_slope, true);       
+            current_slope_count = count_slopes(P, alpha, current_slope, true);     
 
             if (current_slope_count == mid){
-                return mid;
+                for (int i = 0; i < s; i++) {
+                        S_best[i] = S[i];
+                }
+                break;
             }
             else if (abs(current_slope_count - mid) < min_difference){
                     // update min_difference and its set of points
+                    found_best = true;
                     min_difference = abs(current_slope_count - mid);
                     for (int i = 0; i < s; i++) {
                         S_best[i] = S[i];
@@ -282,11 +283,15 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
             }    
         }
     }
+    // prevent segmentation fault
+    // if (found_best) {
+    //     best_slope = compute_slope(S_best[0], S_best[1]); 
+    // }
+    // else {
+    //     best_slope = compute_slope(S[0], S[1]); 
+    // }
 
-    SLOPE_TYPE best_slope = compute_slope(S_best[0], S_best[1]); 
+    best_slope = compute_slope(S_best[0], S_best[1]); 
 
     return best_slope;
 }
-
-// This is just a comment to test if pushing works
-// this is push for testing for global config

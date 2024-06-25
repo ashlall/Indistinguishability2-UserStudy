@@ -1322,7 +1322,6 @@ double random_fake(point_set_t* P, point_t* u, int s,  double epsilon, double de
 //==============================================================================================
 
 double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
-
     // set of candidate tuples
     vector<int> C_idx;
     for(int i = 0; i < P->numberOfPoints; i++) {
@@ -1331,14 +1330,15 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 
     // set up 
     int dim = P->points[0]->dim;
-    point_t* estimated_u = new point_t;
-    estimated_u->dim = dim;
 
     SLOPE_TYPE slope_breakpoint;
     COORD_TYPE ratio_breakpoint;
+	COORD_TYPE user_ratio;
 
     double alpha = min_slope(P);
     double beta = 0;
+
+	cout << "min slope is: " << alpha << endl;
 
     while(Qcount < maxRound) {
 		Qcount++;
@@ -1347,7 +1347,8 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         ratio_breakpoint = slope_to_ratio(slope_breakpoint);
         
         // simulate user interaction, update alpha and beta
-        if (u->coord[1]/u->coord[0] < ratio_breakpoint) {
+		user_ratio = u->coord[1]/u->coord[0];
+        if (user_ratio < ratio_breakpoint) {
             beta = slope_breakpoint;
         }
         else {
@@ -1355,9 +1356,8 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         }
     }
 
-    COORD_TYPE ratio_alpha = -1/alpha;
-    COORD_TYPE ratio_beta = -1/beta;
-    COORD_TYPE estimated_ratio = (ratio_alpha + ratio_beta) / 2;
+    COORD_TYPE ratio_alpha = slope_to_ratio(alpha);
+	COORD_TYPE ratio_beta = slope_to_ratio(beta);
 
     // This should be in the beginning, but leave this here for the purpose of s = 2
     vector<double> L, H;
@@ -1368,6 +1368,8 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
     H.push_back(1);
     H.push_back(ratio_beta);
 
+	cout << "alpha: " << alpha << endl;
+	cout << "beta: " << beta << endl;
 	cout << "L: " << L[1] << endl;
 	cout << "H: " << H[1] << endl;
 
@@ -1422,7 +1424,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         }
     if (C_idx.size() - inI > 0)
         avg_effective_epsilon /= C_idx.size() - inI;
-    printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
+    printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
     Csize = C_idx.size();
 
 
