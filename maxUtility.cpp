@@ -1422,7 +1422,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         }
     if (C_idx.size() - inI > 0)
         avg_effective_epsilon /= C_idx.size() - inI;
-    printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+    printf("Breakpoint - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
     Csize = C_idx.size();
 
     return alpha_approx;

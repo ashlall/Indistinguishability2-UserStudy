@@ -254,7 +254,7 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     double min_difference = INF;
     SLOPE_TYPE best_slope;
 
-    for (int i = 0; i < 100; i++){
+    for (int i = 0; i < P->numberOfPoints; i++){
         // generate random set of points
         for (int i = 0; i < s; i++) {
             S[i] = P -> points[rand() % (P -> numberOfPoints)];
