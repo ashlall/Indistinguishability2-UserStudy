@@ -259,13 +259,11 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
         for (int i = 0; i < s; i++) {
             S[i] = P -> points[rand() % (P -> numberOfPoints)];
         }
-
-        // compute slope of this set, for now s = 2
-        current_slope = compute_slope(S[0], S[1]);          
+        current_slope = compute_slope(S[0], S[1]);  
 
         // check if slope within range
         if (current_slope >= alpha && current_slope <= beta){
-            current_slope_count = count_slopes(P, alpha, current_slope, true);     
+            current_slope_count = count_slopes(P, alpha, current_slope, true); 
 
             if (current_slope_count == mid){
                 for (int i = 0; i < s; i++) {
@@ -284,14 +282,12 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
         }
     }
     // prevent segmentation fault
-    // if (found_best) {
-    //     best_slope = compute_slope(S_best[0], S_best[1]); 
-    // }
-    // else {
-    //     best_slope = compute_slope(S[0], S[1]); 
-    // }
+    if (found_best) {
+        best_slope = compute_slope(S_best[0], S_best[1]); 
+        return best_slope;
+    }
+    else {
+        return alpha;   
+    }
 
-    best_slope = compute_slope(S_best[0], S_best[1]); 
-
-    return best_slope;
 }
