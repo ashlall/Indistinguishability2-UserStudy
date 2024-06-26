@@ -318,7 +318,7 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[5][100];
-  int REPEATS = 2; // number of times to repeat experiment
+  int REPEATS = 10; // number of times to repeat experiment
   int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, BREAKPOINT = 4;
   int MIN_Q = 5, MAX_Q = 15; // MAX < 100
   int reps = 10; // number of times needed my MinR and MinC
@@ -512,7 +512,6 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
 
       alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
       avg_alpha[Breakpoint][i] += alpha/REPEATS;
-
 	  }
 
       }

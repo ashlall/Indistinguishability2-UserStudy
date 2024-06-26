@@ -1335,7 +1335,6 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 
 	for (int i = 0; i < dim; i++) {
 		L.push_back(min_slope(P, a, i));
-		cout << "L[" << i << "] = " << L[i] << endl;
 	}
 
 	L[a] = -1;
@@ -1367,11 +1366,17 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 	// convert from slope to ratio
 	for (int i = 0; i < dim; i++) {
 		L[i] = slope_to_ratio(L[i]);
-		H[i] = slope_to_ratio(H[i]);
+		// prevent negative infinity H[i] bound
+		if (H[i] == 0) {
+			H[i] = 1000;
+		}
+		else {
+		H[i] = slope_to_ratio(H[i]); 
+		}
+
 	}
 
 	// debug block
-
 	for (int i = 0; i < dim; i++) {
 		cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
 		cout << "L[" << i << "] = " << L[i] << endl;
