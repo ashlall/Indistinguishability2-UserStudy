@@ -206,7 +206,7 @@ void run_test(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
   //printf("%10s : %lf\n", "RandomFake", alpha_RF);
   printf("%10s : %lf\n", "MinD", alpha_MD);
   printf("%10s : %lf\n", "MinR", alpha_MR);
-  printf("%10s : %lf\n", "Breakpoint", alpha_MR);
+  printf("%10s : %lf\n", "Breakpoint", alpha_BP);
 
   release_point(u);
 }
@@ -511,7 +511,7 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
 	    avg_alpha[MIN_R][i] += alpha/REPEATS;
 
       alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
-      avg_alpha[Breakpoint][s] += alpha/REPEATS;
+      avg_alpha[Breakpoint][i] += alpha/REPEATS;
 
 	  }
 
@@ -589,7 +589,7 @@ void run_vary_delta(point_set_t* P, point_set_t* cskyline, double epsilon, doubl
 	      avg_alpha[MIN_R][i] += alpha/REPEATS;
 
         alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
-        avg_alpha[Breakpoint][s] += alpha/REPEATS;
+        avg_alpha[Breakpoint][i] += alpha/REPEATS;
 	    }
 	}
       
@@ -666,7 +666,7 @@ void run_vary_epsilon_delta(point_set_t* P, point_set_t* cskyline, double epsilo
 	    avg_alpha[MIN_R][i] += alpha/REPEATS;
 
       alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
-      avg_alpha[Breakpoint][s] += alpha/REPEATS;
+      avg_alpha[Breakpoint][i] += alpha/REPEATS;
 
 	  }
       }
@@ -701,7 +701,7 @@ void run_false_positives(point_set_t* P, point_set_t* cskyline, double epsilon, 
   int REPEATS = 10, reps = 10;
   int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4, REAL = 5;
   
-  for(int i = 0; i < 5; ++i) 
+  for(int i = 0; i < 6; ++i) 
     C_size[i] = 0.0;
   
   for(int repeat = 0; repeat < REPEATS; ++repeat)
@@ -934,7 +934,7 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
       t[i][j] = 0.0;
 
   for(int i = 0; i < 4; ++i)
-  {
+  { // we have to generate the dataset to provide to the function
     sprintf(filename, "a%d-%d.txt", dim, n);
 
     // read the dataset
