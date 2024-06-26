@@ -527,8 +527,8 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
   epsilon = MIN_E;
   for(int i = 0; i < 3; ++i)
     {
-      printf("%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
-      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
+      printf("%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
+      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
       epsilon *= FACTOR_E;
     }
   fclose(fp);

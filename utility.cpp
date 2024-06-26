@@ -23,25 +23,35 @@ COORD_TYPE ratio_to_slope   (COORD_TYPE r) {
 // Return: 
 //      Slope between p1 and p2 
 //==============================================================================================
-SLOPE_TYPE compute_slope(point_t* p1, point_t* p2) {
-    if (p2->coord[0] == p1->coord[0]) {
+SLOPE_TYPE compute_slope(point_t* p1, point_t* p2, int dim_a, int dim_i) {
+    if (p2->coord[dim_a] == p1->coord[dim_a]) {
         return INF; 
     }
-    return (p2->coord[1] - p1->coord[1]) / (p2->coord[0] - p1->coord[0]);
+    return (p2->coord[dim_i] - p1->coord[dim_i]) / (p2->coord[dim_a] - p1->coord[dim_i]);
 }
 
 //==============================================================================================
 // Helper function for comparison in min_slope for x - coord
 //==============================================================================================
-bool compare_points_x(const point_t* p1, const point_t* p2) {
-    // compares x values first, if same, then smaller y gets sort first
-    if (abs(p1->coord[0] - p2->coord[0]) < .0001) { 
-         return p1->coord[1] < p2->coord[1];
+
+bool compare_points_x(const point_t& p1, const point_t& p2, int dim_a, int dim_i) {
+    if (abs(p1.coord[dim_a] - p2.coord[dim_a]) < .0001) { 
+         return p1.coord[dim_i] < p2.coord[dim_i];
     } 
     else {
-        return p1->coord[0] < p2->coord[0];
+        return p1.coord[dim_a] < p2.coord[dim_a];
     }
 }
+
+struct Comparator_X {
+    int dim_a;
+    int dim_i;
+    Comparator_X(int a, int i) : dim_a(a), dim_i(i) {}
+
+    bool operator()(const point_t* p1, const point_t* p2) const {
+        return compare_points_x(*p1, *p2, dim_a, dim_i);
+    }
+};
 
 
 //==============================================================================================
@@ -49,23 +59,23 @@ bool compare_points_x(const point_t* p1, const point_t* p2) {
 // Computes the minimum slope in a set of points P
 // Parameters:
 //      P       - input data set
-//      0   - anchor dimension
+//      dim_a   - anchor dimension
 //      dim_i   - current dimension
 // Return: 
 //      minimum slope in P in dimension a and i
 //==============================================================================================
-SLOPE_TYPE min_slope(point_set_t* P) {
+SLOPE_TYPE min_slope(point_set_t* P, int dim_a, int dim_i) {
     if (P->numberOfPoints < 2) {
         return INF;
     }
 
     // sort points based on x-coordinate
-    sort(P->points, P->points + P->numberOfPoints, compare_points_x);
+    sort(P->points, P->points + P->numberOfPoints, Comparator_X(dim_a, dim_i));
 
     // compute slopes of adjacent points
     SLOPE_TYPE min_slope = INF;
     for (int i = 0; i < P->numberOfPoints - 1; i++) {
-        SLOPE_TYPE slope = compute_slope(P->points[i], P->points[i+1]);
+        SLOPE_TYPE slope = compute_slope(P->points[i], P->points[i+1], dim_a, dim_i);
         if (slope < min_slope) {
             min_slope = slope;
         }
@@ -76,16 +86,18 @@ SLOPE_TYPE min_slope(point_set_t* P) {
 //==============================================================================================
 // Helper function for comparison in count_slopes - y at alpha
 //==============================================================================================
-bool compare_points_alpha(const point_t& p1, const point_t& p2, double alpha) {
-    return (p1.coord[0] * alpha - p1.coord[1]) < (p2.coord[0] * alpha - p2.coord[1]);
+bool compare_points_alpha(const point_t& p1, const point_t& p2, double alpha, int dim_a, int dim_i) {
+    return (p1.coord[dim_a] * alpha - p1.coord[dim_i]) < (p2.coord[dim_a] * alpha - p2.coord[dim_i]);
 }
 
 struct Comparator_Alpha {
     double alpha;
-    Comparator_Alpha(double f) : alpha(f) {}
+    int dim_a;
+    int dim_i;
+    Comparator_Alpha(double f, int a, int i) : alpha(f), dim_a(a), dim_i(i) {}
 
     bool operator()(const point_t* p1, const point_t* p2) const {
-        return compare_points_alpha(*p1, *p2, alpha);
+        return compare_points_alpha(*p1, *p2, alpha, dim_a, dim_i);
     }
 };
 
@@ -93,16 +105,18 @@ struct Comparator_Alpha {
 // Helper function for comparison in count_slopes - y at beta
 //==============================================================================================
 
-bool compare_points_beta(const point_order_t& p1, const point_order_t& p2, double beta) {
-    return (p1.point->coord[0] * beta - p1.point->coord[1]) < (p2.point->coord[0] * beta - p2.point->coord[1]);
+bool compare_points_beta(const point_order_t& p1, const point_order_t& p2, double beta, int dim_a, int dim_i) {
+    return (p1.point->coord[dim_a] * beta - p1.point->coord[dim_i]) < (p2.point->coord[dim_a] * beta - p2.point->coord[dim_i]);
 }
 
 struct Comparator_Beta {
     double beta;
-    Comparator_Beta(double f) : beta(f) {}
+    int dim_a;
+    int dim_i;
+    Comparator_Beta(double f, int a, int i) : beta(f), dim_a(a), dim_i(i) {}
 
     bool operator()(const point_order_t& p1, const point_order_t& p2) const {
-        return compare_points_beta(p1, p2, beta);
+        return compare_points_beta(p1, p2, beta, dim_a, dim_i);
     }
 };
 
@@ -182,16 +196,26 @@ int merge_and_count(vector<int>& arr, vector<int>& temp, int left, int mid, int 
 //==============================================================================================
 // count_slopes
 // Counts the number of slopes in range [alpha, beta]
+//
+// Important Note: The default parameter value "adjust" is set to false
+//
 // Parameters: 
 //      P       - input data set
 //      alpha   - lower threshold
 //      beta    - upper threshold
+//      adjust  - indicates whether to expand alpha and beta range to include the inversions
+//                happening exactly at alpha and beta by a small amount
 // Return:
 //      number of slopes in range [alpha, beta]
 //==============================================================================================
-int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
+int count_slopes(point_set_t* P, double alpha, double beta, bool adjust, int dim_a, int dim_i) {
+    if (adjust == true){
+        alpha -= 0.0001;
+        beta += 0.0001;
+    }
+
     // sort points based on y_at_alpha value
-    sort(P->points, P->points + P->numberOfPoints, Comparator_Alpha(alpha));
+    sort(P->points, P->points + P->numberOfPoints, Comparator_Alpha(alpha, dim_a, dim_i));
 
     // copy original points into vector with order
     vector<point_order_t> point_order;
@@ -204,7 +228,7 @@ int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
     }
 
     // sort points based on y_at_beta value
-    sort(point_order.begin(), point_order.end(), Comparator_Beta(beta));
+    sort(point_order.begin(), point_order.end(), Comparator_Beta(beta, dim_a, dim_i));
 
     // put order of y_at_beta into vector inverted_order
     vector<int> inverted_order;
@@ -230,13 +254,15 @@ int count_slopes(point_set_t* P, double alpha, double beta, bool adjust) {
 //      s           - number of options in one round
 //      alpha       - lower slope threshold 
 //      beta        - upper slope threshold
+//      dim_a       - anchor dimension
+//      dim_i       - dimension
 // Return:
 //      slope of the most even breakpoint
 //==============================================================================================
 
-SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta) {
+SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i) {
     // calculate total slope between alpha and beta
-    int total_slopes = count_slopes(P, alpha, beta, true);
+    int total_slopes = count_slopes(P, alpha, beta, true, dim_a, dim_i);
     int mid = total_slopes / 2;
     // round up
     if (total_slopes % 2 != 0){
@@ -259,11 +285,11 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
         for (int i = 0; i < s; i++) {
             S[i] = P -> points[rand() % (P -> numberOfPoints)];
         }
-        current_slope = compute_slope(S[0], S[1]);  
+        current_slope = compute_slope(S[0], S[1], dim_a, dim_i);  
 
         // check if slope within range
         if (current_slope >= alpha && current_slope <= beta){
-            current_slope_count = count_slopes(P, alpha, current_slope, true); 
+            current_slope_count = count_slopes(P, alpha, current_slope, true, dim_a, dim_i); 
 
             if (current_slope_count == mid){
                 for (int i = 0; i < s; i++) {
@@ -283,11 +309,14 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     }
     // prevent segmentation fault
     if (found_best) {
-        best_slope = compute_slope(S_best[0], S_best[1]); 
+        best_slope = compute_slope(S_best[0], S_best[1], dim_a, dim_i); 
         return best_slope;
     }
     else {
         return alpha;   
     }
-
 }
+
+
+
+

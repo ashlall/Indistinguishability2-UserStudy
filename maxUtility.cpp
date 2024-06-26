@@ -1322,54 +1322,61 @@ double random_fake(point_set_t* P, point_t* u, int s,  double epsilon, double de
 //==============================================================================================
 
 double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
-    // set of candidate tuples
-    vector<int> C_idx;
-    for(int i = 0; i < P->numberOfPoints; i++) {
-        C_idx.push_back(i); 
-    }
-
     // set up 
-    int dim = P->points[0]->dim;
-
-    SLOPE_TYPE slope_breakpoint;
-    COORD_TYPE ratio_breakpoint;
-	COORD_TYPE user_ratio = u->coord[1]/u->coord[0];
-
-    double alpha = min_slope(P);
-    double beta = 0;
-
 	Qcount = 0;
+    int dim = P->points[0]->dim;
+	COORD_TYPE user_ratio;
 
+	// anchor dimension
+	int a = 0;		
+
+	// Initialize L and H slope bounds
+	vector<double> L, H(dim, 0);
+
+	for (int i = 0; i < dim; i++) {
+		L.push_back(min_slope(P, a, i));
+		cout << "L[" << i << "] = " << L[i] << endl;
+	}
+
+	L[a] = -1;
+	H[a] = -1;
+
+	int i = 0;
     while(Qcount < maxRound) {
-		Qcount++;
-        // find points that divides the range alpha beta most evenly, take that slope
-        slope_breakpoint = breakpoint_one_round(P, s, alpha, beta);
-        ratio_breakpoint = slope_to_ratio(slope_breakpoint);
-        
+		if (i == a) {
+			i = (i + 1) % dim;
+		}
+
+        SLOPE_TYPE slope_breakpoint = breakpoint_one_round(P, s, L[i], H[i], a, i);
+        COORD_TYPE ratio_breakpoint = slope_to_ratio(slope_breakpoint);
+
+		user_ratio = u->coord[i]/u->coord[a];
+
         // simulate user interaction, update alpha and beta
         if (user_ratio < ratio_breakpoint) {
-            beta = slope_breakpoint;
+            H[i] = slope_breakpoint;
         }
         else {
-            alpha = slope_breakpoint;
+            L[i] = slope_breakpoint;
         }
+
+		Qcount++;
+		i = (i + 1) % dim;
     }
 
-    COORD_TYPE ratio_alpha = slope_to_ratio(alpha);
-	COORD_TYPE ratio_beta = slope_to_ratio(beta);
+	// convert from slope to ratio
+	for (int i = 0; i < dim; i++) {
+		L[i] = slope_to_ratio(L[i]);
+		H[i] = slope_to_ratio(H[i]);
+	}
 
-    // This should be in the beginning, but leave this here for the purpose of s = 2
-    vector<double> L, H;
+	// debug block
 
-    L.push_back(1);
-    L.push_back(ratio_alpha);
-
-    H.push_back(1);
-    H.push_back(ratio_beta);
-
-	cout << "Real ratio is: " << user_ratio << endl;
-	cout << "L: " << L[1] << endl;
-	cout << "H: " << H[1] << endl;
+	for (int i = 0; i < dim; i++) {
+		cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
+		cout << "L[" << i << "] = " << L[i] << endl;
+		cout << "H[" << i << "] = " << H[i] << endl;
+	}
 
     // find the highest value from the low-end of the user utilities
     double highest = 0.0;
@@ -1377,20 +1384,21 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
     {
         double dot = 0.0;
         for(int k = 0; k < dim; ++k)
-        dot += P->points[j]->coord[k] * L[k];
+        	dot += P->points[j]->coord[k] * L[k];
         if (dot > highest)
-        highest = dot;
+        	highest = dot;
     }
 
     // prune all the points that have their high-end utility (1+epsilon) dominated
+	vector<int> C_idx;
     C_idx.clear();
     for (int j = 0; j < P->numberOfPoints; ++j)
     {
         double dot = 0.0;
         for(int k = 0; k < dim; ++k)
-        dot += P->points[j]->coord[k] * H[k];
+        	dot += P->points[j]->coord[k] * H[k];
         if (dot * (1 + epsilon) >= highest)
-        C_idx.push_back(j);
+        	C_idx.push_back(j);
     }
 
     // Find out how well this did:
@@ -1399,7 +1407,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
     {
         double value = dot_prod(u, P->points[i]);
         if(value > max_value)
-        max_value = value;
+        	max_value = value;
     }
 
     int inI = 0;
@@ -1409,7 +1417,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         {
         double value = dot_prod(u, P->points[C_idx[i]]);
         if(value * (1 + epsilon) > max_value)
-        inI++;
+        	inI++;
         else
         {
         avg_effective_epsilon += max_value/value - 1.0;
