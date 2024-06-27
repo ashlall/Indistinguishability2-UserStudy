@@ -32,20 +32,18 @@ SLOPE_TYPE compute_slope(point_t* p1, point_t* p2, int dim_a, int dim_i) {
     if (p2->coord[dim_a] == p1->coord[dim_a]) {
         return INF; 
     }
-    return (p2->coord[dim_i] - p1->coord[dim_i]) / (p2->coord[dim_a] - p1->coord[dim_i]);
+    return (p2->coord[dim_i] - p1->coord[dim_i]) / (p2->coord[dim_a] - p1->coord[dim_a]);
 }
 
 //==============================================================================================
 // Helper function for comparison in min_slope for x - coord
 //==============================================================================================
-
 bool compare_points_x(const point_t& p1, const point_t& p2, int dim_a, int dim_i) {
-    if (abs(p1.coord[dim_a] - p2.coord[dim_a]) < .0001) { 
+    // edge case - if x values are equal, sort by y
+    if (abs(p1.coord[dim_a] - p2.coord[dim_a]) < .000001) { 
          return p1.coord[dim_i] < p2.coord[dim_i];
     } 
-    else {
-        return p1.coord[dim_a] < p2.coord[dim_a];
-    }
+    return p1.coord[dim_a] < p2.coord[dim_a];
 }
 
 struct Comparator_X {
@@ -57,7 +55,6 @@ struct Comparator_X {
         return compare_points_x(*p1, *p2, dim_a, dim_i);
     }
 };
-
 
 //==============================================================================================
 // min_slope
@@ -78,14 +75,14 @@ SLOPE_TYPE min_slope(point_set_t* P, int dim_a, int dim_i) {
     sort(P->points, P->points + P->numberOfPoints, Comparator_X(dim_a, dim_i));
 
     // compute slopes of adjacent points
-    SLOPE_TYPE min_slope = INF;
+    SLOPE_TYPE min_slope_value = INF;
     for (int i = 0; i < P->numberOfPoints - 1; i++) {
         SLOPE_TYPE slope = compute_slope(P->points[i], P->points[i+1], dim_a, dim_i);
-        if (slope < min_slope) {
-            min_slope = slope;
+        if (slope < min_slope_value) {
+            min_slope_value = slope;
         }
     }
-    return min_slope;
+    return min_slope_value;
 }
 
 //==============================================================================================
@@ -273,6 +270,13 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     if (total_slopes % 2 != 0){
         mid++;             
     }
+
+    // if (DEBUG) {
+    //     cout << "alpha in breakpoint one round: " << alpha << endl;
+    //     cout << "beta in breakpoint one round: " << beta << endl;
+    //     cout << "total slopes in breakpoint one round: " << total_slopes << endl;
+    //     cout << "half slopes in breakpoint one round: " << mid << endl;
+    // }
     
     // sampling set up
     bool found_best = false;
@@ -285,7 +289,7 @@ SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta
     double min_difference = INF;
     SLOPE_TYPE best_slope;
 
-    for (int i = 0; i < P->numberOfPoints; i++){
+    for (int i = 0; i < 10000; i++){
         // generate random set of points
         for (int i = 0; i < s; i++) {
             S[i] = P -> points[rand() % (P -> numberOfPoints)];

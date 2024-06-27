@@ -1331,11 +1331,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 	int a = 0;		
 
 	// Initialize L and H slope bounds
-	vector<double> L, H(dim, 0);
-
-	for (int i = 0; i < dim; i++) {
-		L.push_back(min_slope(P, a, i));
-	}
+	vector<double> L(dim, -INF), H(dim, 0);
 
 	L[a] = -1;
 	H[a] = -1;
@@ -1354,8 +1350,15 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         // simulate user interaction, update alpha and beta
         if (user_ratio < ratio_breakpoint) {
             H[i] = slope_breakpoint;
+			if (DEBUG) {
+				cout << "User ratio is " << user_ratio << endl;
+				cout << "Slope breakpoint is " << slope_breakpoint << endl; 
+				cout << "Ratio breakpoint is " << ratio_breakpoint << endl;
+				cout << "H[i] is updated to " << H[i] << endl;
+			}
         }
         else {
+			cout << "L[i] is updated to " << L[i] << endl;
             L[i] = slope_breakpoint;
         }
 
@@ -1368,7 +1371,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 		L[i] = slope_to_ratio(L[i]);
 		// prevent negative infinity H[i] bound
 		if (H[i] == 0) {
-			H[i] = 1000;
+			H[i] = INF;
 		}
 		else {
 		H[i] = slope_to_ratio(H[i]); 

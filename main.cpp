@@ -168,8 +168,11 @@ void run_test(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
 
   // generate the utility vector
   point_t* u = alloc_point(dim);
-  for (int i = 0; i < dim; i++)
+  cout << "Real utility is: " << endl;
+  for (int i = 0; i < dim; i++) {
     u->coord[i] = ((double)rand()) / RAND_MAX;
+    cout << u->coord[i] << endl;
+  }
 
   // look for the ground truth maximum utility point
   int maxIdx = 0;

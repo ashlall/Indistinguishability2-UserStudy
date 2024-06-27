@@ -19,6 +19,7 @@
 #include <queue>
 
 #define SLOPE_TYPE          double
+#define DEBUG               0
 
 // helper data structure for count_slopes
 typedef struct point_order

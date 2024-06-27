@@ -7,8 +7,8 @@ valgrind:
 gdb:
 	g++ -g -w *.c *.cpp -lglpk -lm -o run
 
-utility:
-	g++ -w test_utility.cpp utility.cpp data_utility.cpp -lglpk -lm -Ofast -o run_utility
+countslopes:
+	g++ -w test_count_slopes.cpp utility.cpp data_utility.cpp read_write.cpp -lglpk -lm -Ofast -o run_countslopes
 
 clean:
 	rm run
