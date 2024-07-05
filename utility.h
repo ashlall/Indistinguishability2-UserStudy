@@ -19,9 +19,8 @@
 #include <queue>
 
 #define SLOPE_TYPE          double
-#define DEBUG               0
 
-// helper data structure for count_slopes
+// Helper data structure for count_slopes
 typedef struct point_order
 {
     point_t *point;
@@ -36,9 +35,11 @@ SLOPE_TYPE              compute_slope           (point_t* p1, point_t* p2, int d
 SLOPE_TYPE              min_slope               (point_set_t* P, int dim_a, int dim_i);
 int                     count_inversions        (vector<int>& arr);
 int                     count_slopes            (point_set_t* P, double alpha, double beta, bool adjust, int dim_a, int dim_i);
-COORD_TYPE              breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i);
-double                  max_utility_breakpoint  (point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 
+// Strongly truthful algorithms
+SLOPE_TYPE              breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i);
+point_t**               breakpoint_one_round_new(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i);
+double                  max_utility_breakpoint  (point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 
 #endif
 

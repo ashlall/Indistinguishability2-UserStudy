@@ -201,8 +201,7 @@ void run_test(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
   //double alpha_RF = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
   double alpha_MD = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
   double alpha_MR = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
-  double alpha_BP = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
-
+  double alpha_BP = max_utility_breakpoint_new(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
 
 
   //printf("%10s : %lf\n", "SqueezeU", alpha_SU);
