@@ -16,7 +16,7 @@
 #define INF					100000000
 #define	MAX_FILENAME_LENG	256
 
-#define DEBUG 1
+#define DEBUG 0
 
 
 #define CONFIG_FILE	"rtree.config"

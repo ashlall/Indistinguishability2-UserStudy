@@ -37,8 +37,7 @@ int                     count_inversions        (vector<int>& arr);
 int                     count_slopes            (point_set_t* P, double alpha, double beta, bool adjust, int dim_a, int dim_i);
 
 // Strongly truthful algorithms
-SLOPE_TYPE              breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i);
-point_t**               breakpoint_one_round_new(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i);
+point_t**               breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i);
 double                  max_utility_breakpoint  (point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 
 #endif
