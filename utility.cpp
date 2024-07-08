@@ -381,8 +381,10 @@ point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double b
     point_t*        S_best[s];    
 
     SLOPE_TYPE      Slope[s-1]; 
-    SLOPE_TYPE      min_slope   = INF;
-    SLOPE_TYPE      max_slope   = -INF;     
+    SLOPE_TYPE      min_slope           = INF;
+    SLOPE_TYPE      max_slope           = -INF;   
+    int             max_slope_count     = 0;  
+    int             current_slope_count = 0;
 
     SLOPE_TYPE      X[s+1];
     int             B[s];
@@ -390,10 +392,11 @@ point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double b
     int             min_V       = INF;
     vector<SLOPE_TYPE>      X_best;
 
-    for (int j = 0; j < 10000; j++){
+    for (int j = 0; j < 10000; j++) {
         // reset min slope and max slope
         min_slope = INF;
         max_slope = -INF;
+        current_slope_count = 0;
 
         // generate random set of points
         for (int i = 0; i < s; i++) {
@@ -411,10 +414,17 @@ point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double b
             if (Slope[i] > max_slope) {
                 max_slope = Slope[i];
             }
+            if (Slope[i] > alpha && Slope[i] < beta) {
+                current_slope_count++;
+            }
+        }
+
+        if (current_slope_count > max_slope_count) {
+            max_slope_count = current_slope_count;
         }
 
         // line 14
-        if (min_slope > alpha && max_slope < beta) {
+        if ((min_slope > alpha && max_slope < beta)) {
             good_samples++;
 
             X[0] = alpha;
@@ -428,7 +438,7 @@ point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double b
                 B[i] = count_slopes(P, X[i], X[i+1], true, dim_a, dim_i);
             }
 
-            // reset V and min_V
+            // reset V 
             V = 0;
 
             // line 16
@@ -453,17 +463,22 @@ point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double b
             }
         }
     }
+
     cout << "The number of satisfying samples is " << good_samples << endl; 
 
     // Copy the result to a dynamically allocated array to return
-    point_t** result = new point_t*[s];
-    for (int i = 0; i < s; ++i) {
-        result[i] = S_best[i];
+    if (found_best) { 
+        point_t** result = new point_t*[s];
+        for (int i = 0; i < s; ++i) {
+            result[i] = S_best[i];
+        }
+
+        return result;
+    }   
+    else {
+        return nullptr;
     }
-
-    return result;
 }
-
 
 
 
