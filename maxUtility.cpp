@@ -1320,12 +1320,10 @@ double random_fake(point_set_t* P, point_t* u, int s,  double epsilon, double de
 // Return:
 //      alpha       - approximation
 //==============================================================================================
-
 double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
     // set up 
 	Qcount = 0;
     int dim = P->points[0]->dim;
-	COORD_TYPE user_ratio;
 
 	// anchor dimension
 	int a = 0;		
@@ -1333,6 +1331,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 	// Initialize L and H slope bounds
 	vector<double> L(dim, -INF), H(dim, 0);
 
+	// Anchor dimension
 	L[a] = -1;
 	H[a] = -1;
 
@@ -1341,45 +1340,91 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 		if (i == a) {
 			i = (i + 1) % dim;
 		}
+		if (DEBUG) {cout << "This is breakpoint round for dimension " << i << endl; }
+        point_t** points_to_display = breakpoint_one_round(P, s, L[i], H[i], a, i);
 
-        SLOPE_TYPE slope_breakpoint = breakpoint_one_round(P, s, L[i], H[i], a, i);
-        COORD_TYPE ratio_breakpoint = slope_to_ratio(slope_breakpoint);
+		// skip iteration if random set not found
+		if (points_to_display == nullptr) {
+			Qcount++;
+			i = (i + 1) % dim;
+			continue;
+		}
 
-		user_ratio = u->coord[i]/u->coord[a];
+		if (DEBUG) { cout << "User utility: (" << u->coord[a] << ", " << u->coord[i] << ")" << endl; }
 
-        // simulate user interaction, update alpha and beta
-        if (user_ratio < ratio_breakpoint) {
-            H[i] = slope_breakpoint;
-			if (DEBUG) {
-				cout << "User ratio is " << user_ratio << endl;
-				cout << "Slope breakpoint is " << slope_breakpoint << endl; 
-				cout << "Ratio breakpoint is " << ratio_breakpoint << endl;
-				cout << "H[i] is updated to " << H[i] << endl;
+		// Check if we can access points_to_display as wanted
+		if (DEBUG) {
+			for (int j = 0; j < s; j++) {
+				cout << "Point to display is (" << points_to_display[j]->coord[a] << ", " 
+												<< points_to_display[j]->coord[i] << ")" 
+					<< " with utility " << u->coord[a] * points_to_display[j]->coord[a] + u->coord[i] * points_to_display[j]->coord[i] 
+					<< endl;
 			}
-        }
-        else {
-			cout << "L[i] is updated to " << L[i] << endl;
-            L[i] = slope_breakpoint;
-        }
+		}
 
+		// Simulate user interaction, user picks their favorite 
+		double max_value = 0;
+		int best_index = 0;
+		for (int j = 0; j < s; j++) {
+			double value = u->coord[a] * points_to_display[j]->coord[a] + u->coord[i] * points_to_display[j]->coord[i];
+			if (value > max_value) {
+				max_value = value;
+				best_index = j;
+			}
+		}
+
+		if (DEBUG) { cout << "Best point found correctly at index " << best_index << endl; }
+
+		// Note to self - Recompute Slope and X because out of scope
+		SLOPE_TYPE 		Slope[s-1];
+		for (int j = 0; j < s-1; j++) {
+			Slope[j] = compute_slope(points_to_display[j], points_to_display[j+1], a, i);
+			if (DEBUG) { cout << "Slope from points to display is " << Slope[j] << endl; }
+		}
+
+		SLOPE_TYPE      X[s+1];
+		X[0] = L[i];
+		for (int j = 0; j < s-1; j++) {
+			X[j+1] = Slope[j];
+		}
+		X[s] = H[i];
+
+		// See what is in X
+		if (DEBUG) {
+			cout << "Content in X is: " << endl;
+			for (int j = 0; j < s+1; j++) {
+				cout << X[j] << ", ";
+			}
+			cout << endl;
+		}
+
+		// Line 19 - Update L[i] and H[i] accordingly
+		L[i] = X[best_index];
+		H[i] = X[best_index + 1];
+
+		if (DEBUG) {
+			for (int i = 0; i < dim; i++) {
+				cout << "Real slope for dimension " << i << " is: " << ratio_to_slope(u->coord[i]/u->coord[a]) << endl;
+				cout << "L[" << i << "] = " << L[i] << endl;
+				cout << "H[" << i << "] = " << H[i] << endl;
+			}
+		}
+
+		// Finish one round
 		Qcount++;
 		i = (i + 1) % dim;
-    }
+	}
 
 	// convert from slope to ratio
 	for (int i = 0; i < dim; i++) {
 		L[i] = slope_to_ratio(L[i]);
 		// prevent negative infinity H[i] bound
-		if (H[i] == 0) {
-			H[i] = INF;
-		}
-		else {
-		H[i] = slope_to_ratio(H[i]); 
-		}
-
+		if (H[i] == 0) { H[i] = INF; }
+		else { H[i] = slope_to_ratio(H[i]); }
 	}
 
 	// debug block
+	cout << "Last debug print block" << endl;
 	for (int i = 0; i < dim; i++) {
 		cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
 		cout << "L[" << i << "] = " << L[i] << endl;
