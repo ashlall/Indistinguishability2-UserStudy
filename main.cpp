@@ -452,8 +452,8 @@ void run_fix_totalshown(point_set_t* P, point_set_t* cskyline, double epsilon, d
 
   for(s = MIN_S; s <= MAX_S; s += 1)
     {
-      printf("%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
     }
   fclose(fp);
 }
