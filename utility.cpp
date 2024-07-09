@@ -17,8 +17,7 @@ COORD_TYPE ratio_to_slope   (COORD_TYPE r) {
 //==============================================================================================
 // compute_slope
 // Computes the slope between points p1 and p2
-// Parameters:
-//      p1 - point 1
+// Parameters://      p1 - point 1
 //      p2 - point 2
 // Return: 
 //      Slope between p1 and p2 
