@@ -302,8 +302,8 @@ void run_vary_s(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
   for(s = MIN_S; s <= MAX_S; s += 2)
   {
-    printf("%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
-    fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+    printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+    fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
   }
   fclose(fp);
 
@@ -850,8 +850,8 @@ void run_time(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
   char filename[200];
   sprintf(filename, "output/time-%d-%d-e%lf-d%lf-q%d-s%d-%d.dat", dim, P->numberOfPoints, epsilon, delta, q, s, time(NULL));
   FILE* fp = fopen(filename, "w");
-  printf("%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R], t[Breakpoint]);
-  fprintf(fp, "%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R], t[Breakpoint]);
+  printf("%lf\t%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R], t[Breakpoint]);
+  fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", t[SQUEEZEU], t[UHRAND], t[MIN_D], t[MIN_R], t[Breakpoint]);
   fclose(fp);
 }
 
@@ -930,7 +930,7 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
   double elapsed_time;
 
 
-  for(int i = 0; i < 4; ++i)
+  for(int i = 0; i < 5; ++i)
     for(int j = 0; j < 100; ++j)
       t[i][j] = 0.0;
 
@@ -1032,8 +1032,8 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
   n = MIN_n;
   for(int i = 0; i < 4; ++i)
     {
-      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", n, avg_alpha[SQUEEZEU][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i], t[SQUEEZEU][i], t[UHRAND][i], t[MIN_D][i], t[MIN_R][i], t[Breakpoint][i]);
       n *= FACTOR_n;
     }
   fclose(fp);
