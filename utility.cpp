@@ -292,12 +292,7 @@ point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta,
     point_t*        S[s]; 
     point_t*        S_best[s];    
 
-    SLOPE_TYPE      slope_S; 
-
-    int             B[s];
-    int             V           = 0;
     int             min_V       = INF;
-    vector<SLOPE_TYPE>      X_best;
 
     for (int j = 0; j < 1000; j++) {
         // generate random set of points
@@ -309,7 +304,7 @@ point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta,
         sort(S, S + s, Comparator_X_Reverse(dim_a, dim_i));
 
         // compute slope
-        slope_S = compute_slope(S[0], S[1], dim_a, dim_i);
+        SLOPE_TYPE slope_S = compute_slope(S[0], S[1], dim_a, dim_i);
 
         // line 14
         if (slope_S > alpha && slope_S < beta) {
@@ -321,7 +316,7 @@ point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta,
             int num_slopes_S = count_slopes(P, alpha, slope_S, true, dim_a, dim_i);
 
             // reset V 
-            V = abs(num_slopes_S - total_slopes/s);
+            int V = abs(num_slopes_S - total_slopes/s);
 
             // maintain set S that minimizes V
             if (V < min_V) {
