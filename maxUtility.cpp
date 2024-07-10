@@ -1399,8 +1399,10 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 		}
 
 		// Line 19 - Update L[i] and H[i] accordingly
-		L[i] = X[best_index];
-		H[i] = X[best_index + 1];
+		if (X[best_index] >= L[i] && X[best_index + 1] <= H[i]) {
+			L[i] = X[best_index];
+			H[i] = X[best_index + 1];
+		}
 
 		if (DEBUG) {
 			for (int i = 0; i < dim; i++) {

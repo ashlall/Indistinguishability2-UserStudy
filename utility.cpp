@@ -284,14 +284,6 @@ point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta,
     // calculate total slope between alpha and beta
     int total_slopes = count_slopes(P, alpha, beta, true, dim_a, dim_i);
     
-
-    // if (DEBUG) {
-    //     cout << "alpha in breakpoint one round: " << alpha << endl;
-    //     cout << "beta in breakpoint one round: " << beta << endl;
-    //     cout << "total slopes in breakpoint one round: " << total_slopes << endl;
-    //     cout << "half slopes in breakpoint one round: " << mid << endl;
-    // }
-    
     // sampling set up
     bool            found_best  = false;
     int             good_samples = 0;
@@ -312,7 +304,7 @@ point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta,
     int             min_V       = INF;
     vector<SLOPE_TYPE>      X_best;
 
-    for (int j = 0; j < 10000; j++) {
+    for (int j = 0; j < 1000; j++) {
         // reset min slope and max slope
         min_slope = INF;
         max_slope = -INF;
@@ -344,7 +336,7 @@ point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta,
         }
 
         // line 14
-        if ((min_slope > alpha && max_slope < beta)) {
+        if ((current_slope_count == max_slope_count) || (min_slope > alpha && max_slope < beta)) {
             good_samples++;
 
             X[0] = alpha;
