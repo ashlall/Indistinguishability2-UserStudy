@@ -770,8 +770,8 @@ void run_false_positives(point_set_t* P, point_set_t* cskyline, double epsilon, 
   char filename[200];
   sprintf(filename, "output/fp-%d-%d-e%lf-d%lf-q%d-s%d-%d.dat", dim, P->numberOfPoints, epsilon, delta, q, s, time(NULL));
   FILE* fp = fopen(filename, "w");
-  printf("%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[Breakpoint], C_size[REAL]);
-  fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[Breakpoint], C_size[REAL]);
+  printf("%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[Breakpoint], C_size[REAL]);
+  fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", C_size[SQUEEZEU], C_size[UHRAND], C_size[MIN_D], C_size[MIN_R], C_size[Breakpoint], C_size[REAL]);
   fclose(fp);
 }
 
