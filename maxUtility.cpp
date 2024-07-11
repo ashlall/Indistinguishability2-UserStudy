@@ -1375,34 +1375,11 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 
 		if (DEBUG) { cout << "Best point found correctly at index " << best_index << endl; }
 
-		// Note to self - Recompute Slope and X because out of scope
-		SLOPE_TYPE 		Slope[s-1];
-		for (int j = 0; j < s-1; j++) {
-			Slope[j] = compute_slope(points_to_display[j], points_to_display[j+1], a, i);
-			if (DEBUG) { cout << "Slope from points to display is " << Slope[j] << endl; }
-		}
-
-		SLOPE_TYPE      X[s+1];
-		X[0] = L[i];
-		for (int j = 0; j < s-1; j++) {
-			X[j+1] = Slope[j];
-		}
-		X[s] = H[i];
-
-		// See what is in X
-		if (DEBUG) {
-			cout << "Content in X is: " << endl;
-			for (int j = 0; j < s+1; j++) {
-				cout << X[j] << ", ";
-			}
-			cout << endl;
-		}
-
-		// Line 19 - Update L[i] and H[i] accordingly
-		if (X[best_index] >= L[i] && X[best_index + 1] <= H[i]) {
-			L[i] = X[best_index];
-			H[i] = X[best_index + 1];
-		}
+		SLOPE_TYPE 		X[] = {L[i], compute_slope(points_to_display[0], points_to_display[1], a, i), H[i]};
+		
+		// Update L[i] and H[i]
+		L[i] = X[best_index];
+		H[i] = X[best_index + 1];
 
 		if (DEBUG) {
 			for (int i = 0; i < dim; i++) {
