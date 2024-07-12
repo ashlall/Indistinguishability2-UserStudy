@@ -882,7 +882,7 @@ void run_time(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
   fclose(fp);
 }
 
-
+// TT is not included
 void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double delta, int s, int q)
 {
   int dim = P->points[0]->dim;
