@@ -893,11 +893,11 @@ void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[5][10000];
-  int REPEATS = 10;
+  int REPEATS = 500;
   int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   int MIN_T = 10, MAX_T = 500; // MAX_S < 100
 
-  for(int T = MIN_T; T <= MAX_T; T += 20)
+  for(int T = MIN_T; T <= MAX_T; T += 10)
   {
     cout << "T = " << T << endl;
     avg_alpha[MIN_D][T] = 0.0;
@@ -923,8 +923,8 @@ void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double de
       //alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, T);
       //avg_alpha[MIN_R][T] += alpha/REPEATS;
 
-      //alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize, T);
-      //avg_alpha[Breakpoint][T] += alpha/REPEATS;
+      alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize, T);
+      avg_alpha[Breakpoint][T] += alpha/REPEATS;
     }
   }
 
@@ -934,8 +934,8 @@ void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
   for(int T = MIN_T; T <= MAX_T; T += 20)
     {
-      printf("%d\t%lf\t%lf\t%lf\n", T, avg_alpha[MIN_D][T], avg_alpha[MIN_R][T], avg_alpha[Breakpoint][T]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\n", T, avg_alpha[MIN_D][T], avg_alpha[MIN_R][T], avg_alpha[Breakpoint][T]);
+      printf("%d\t%lf\n", T, avg_alpha[Breakpoint][T]);
+      fprintf(fp, "%d\t%lf\n", T, avg_alpha[Breakpoint][T]);
     }
   fclose(fp);
 
