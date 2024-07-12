@@ -1512,3 +1512,205 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 
     return alpha_approx;
 }
+
+
+//==============================================================================================
+// max_utility_TT
+// Description:
+//      Simulate interaction with multiple rounds of interaction and 2-dimensional tuples
+//      n - dimensions and s = 2
+// Parameters: 
+//      P           - input data set
+//      u           - unknown utility vector
+//      s           - number of points to display each round (s = 2 in this case)
+//      maxRound    - maximum number of rounds of interactions / budget of questions
+// Return:
+//      alpha       - approximation
+//==============================================================================================
+double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
+	
+	// number of dimensions
+	int dim = P->points[0]->dim;
+
+	double min_dim_values[dim]; 							
+	double current_min;
+
+	// keep track of minimum val. for each dimension
+	for (int i = 0; i < dim; i++){
+		current_min = INF;
+		for (int j = 0; j < P -> numberOfPoints; j++){
+			if (P -> points[j] -> coord[i] < current_min){
+				current_min = P -> points[j] -> coord[i];
+			}
+		min_dim_values[i] = current_min;
+		}
+	}
+
+	// initialize random point p and get rand point from P
+	point_t* p; 			
+	p = P -> points[rand() % (P -> numberOfPoints)]; 
+
+	// check if p is a min point in any of the dimension
+	bool min_present = true;
+	while (min_present == true){
+		min_present = false;
+		for (int d = 0; d < dim; d++){
+			if (min_dim_values[d] == p -> coord[d]){
+				min_present = true;
+			}
+		}
+		
+		if (min_present == true){
+			p = P -> points[rand() % (P -> numberOfPoints)]; 
+		} else{
+			min_present = false;
+		}
+	}
+
+	// line 2
+	int i_star = 0;
+	int i = 1;
+
+	// line 4
+	double a;
+	if (p -> coord[i_star] - min_dim_values[i_star] < p -> coord[i] - min_dim_values[i]){
+		a = p -> coord[i_star] - min_dim_values[i_star];
+	} else {
+		a = p -> coord[i] - min_dim_values[i];
+	}
+
+	double pt1_utility;
+	double pt2_utility;
+
+	// Simulate user interaction, user picks their preference 
+	while (i < dim){
+		pt1_utility = u->coord[i_star] * min_dim_values[i_star] + u->coord[i] * p->coord[i];
+		pt1_utility = (u->coord[i_star] * (min_dim_values[i_star] + a)) + (u->coord[i] * (p->coord[i] - a));
+
+		if (pt1_utility < pt1_utility){
+			i_star = i;
+		}
+		
+		i = i + 1;
+	}
+
+	// Line 7 - For each dim, initialize L_i and H_i
+	// Initialize L and H slope bounds
+	vector<double> L(dim, 0), H(dim, 1);
+
+	// Anchor dimension
+	L[i_star] = 1;
+	H[i_star] = 1;
+
+	// Line 8
+	Qcount = 0;
+	vector<double> b(dim);					// desired ratio breakpoint
+	vector<double> b_hat(dim);				// desired slope breakpoint
+	double width;
+	double height;
+	point_t* p_new;
+
+	// Line 8
+	i = 0;
+	while (Qcount < maxRound){
+		if (i == i_star){
+			i = (i + 1) % dim;
+		}
+		
+		b[i] = L[i] + ((L[i] - H[i])/2);
+		b_hat[i] = (-1/b[i]);
+
+		// Line 13
+		width = p -> coord[i_star] - min_dim_values[i_star];
+		height = p -> coord[i] - min_dim_values[i];
+
+		// Line 14
+		if (p -> coord[i] + (width * b_hat[i]) < min_dim_values[i]){
+			p_new -> coord[0] = (p -> coord[i_star] - (height/b_hat[i]));
+			p_new -> coord[1] = (p -> coord[i] - height);
+		} else {
+			p_new -> coord[0] = (p -> coord[i_star] + width);
+			p_new -> coord[1] = (p -> coord[i] + (width * b_hat[i]));
+		}
+
+		double p_utility;
+		double p_new_utility;
+
+		// Line 18
+		// Simulate user interaction, user picks their preference 
+		p_utility = u->coord[i_star] * min_dim_values[i_star] + u->coord[i] * p->coord[i];
+		p_new_utility = (u->coord[i_star] * p_new -> coord[0]) + (u->coord[i] * p_new -> coord[1]);
+
+
+		// Line 19 -22
+		if (p_utility > p_new_utility){
+			L[i] = b[i];
+		} else {
+			H[i] = b[i];
+		}
+		
+		// Line 23
+		i = (i + 1) % dim;
+		Qcount++;
+	}
+
+	// Line 24 - 30
+	
+    // find the highest value from the low-end of the user utilities
+    double highest = 0.0;
+    for (int j = 0; j < P->numberOfPoints; ++j)
+    {
+        double dot = 0.0;
+        for(int k = 0; k < dim; ++k)
+        	dot += P->points[j]->coord[k] * L[k];
+        if (dot > highest)
+        	highest = dot;
+    }
+
+    // prune all the points that have their high-end utility (1+epsilon) dominated
+	vector<int> C_idx;
+    C_idx.clear();
+    for (int j = 0; j < P->numberOfPoints; ++j)
+    {
+        double dot = 0.0;
+        for(int k = 0; k < dim; ++k)
+        	dot += P->points[j]->coord[k] * H[k];
+        if (dot * (1 + epsilon) >= highest)
+        	C_idx.push_back(j);
+    }
+
+    // Find out how well this did:
+    double max_value = 0;
+    for(int i = 0; i < P->numberOfPoints; i++)
+    {
+        double value = dot_prod(u, P->points[i]);
+        if(value > max_value)
+        	max_value = value;
+    }
+
+    int inI = 0;
+    double alpha_approx = 0.0;
+    double avg_effective_epsilon = 0.0, max_effective_epsilon = 0.0;
+    for(int i = 0; i < C_idx.size(); i++)
+        {
+        double value = dot_prod(u, P->points[C_idx[i]]);
+        if(value * (1 + epsilon) > max_value)
+        	inI++;
+        else
+        {
+        avg_effective_epsilon += max_value/value - 1.0;
+        if (max_value/value - 1.0 > max_effective_epsilon)
+            max_effective_epsilon = max_value/value - 1.0;
+
+        if (max_value - value * (1 + epsilon) > alpha_approx)
+            alpha_approx = max_value - value * (1 + epsilon);
+        }
+        }
+    if (C_idx.size() - inI > 0)
+        avg_effective_epsilon /= C_idx.size() - inI;
+    printf("TT - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+    Csize = C_idx.size();
+
+    return alpha_approx;
+
+}
