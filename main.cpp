@@ -464,8 +464,8 @@ void run_fix_totalshown(point_set_t* P, point_set_t* cskyline, double epsilon, d
 
   for(s = MIN_S; s <= MAX_S; s += 1)
     {
-      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[TT][q], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
-      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[TT][q], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[TT][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[TT][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
     }
   fclose(fp);
 }
@@ -544,8 +544,8 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
   epsilon = MIN_E;
   for(int i = 0; i < 3; ++i)
     {
-      printf("%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[TT][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
-      fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[TT][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
+      printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[TT][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
+      fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", epsilon, avg_alpha[SQUEEZEU][i], avg_alpha[TT][i], avg_alpha[UHRAND][i], avg_alpha[MIN_D][i], avg_alpha[MIN_R][i], avg_alpha[Breakpoint][i]);
       epsilon *= FACTOR_E;
     }
   fclose(fp);
