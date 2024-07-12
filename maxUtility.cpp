@@ -1321,15 +1321,44 @@ double random_fake(point_set_t* P, point_t* u, int s,  double epsilon, double de
 //      alpha       - approximation
 //==============================================================================================
 double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {
-    // set up 
+    // Set up 
 	Qcount = 0;
     int dim = P->points[0]->dim;
 
-	// anchor dimension
+	// Anchor dimension
 	int a = 0;		
 
 	// Initialize L and H slope bounds
 	vector<double> L(dim, -INF), H(dim, 0);
+
+	// Feature: Correlation check
+	int highest_min_breakpoint = -INF;
+
+	for (int i = 0; i < dim; i++) {
+		int min_breakpoint = INF;
+		for (int j = 0; j < dim; j++) {
+			if (i == j) {
+				continue;
+			}
+			int num_breakpoint = count_slopes(P, -INF, 0, true, i, j);
+			if (num_breakpoint < min_breakpoint) {
+				min_breakpoint = num_breakpoint;
+			}
+		if (DEBUG) {
+			cout << "Min breakpoint for dimension " << i << " with dimension " << j << " is " << min_breakpoint << endl;
+		}
+		}
+		if (min_breakpoint > highest_min_breakpoint) {
+			highest_min_breakpoint = min_breakpoint;
+
+			// Set anchor dimension to current dimension
+			a = i;
+		}
+	}
+	if (DEBUG) {
+		cout << "Anchor dimension is " << a  << " because it has the highest number of breakpoints of " 
+			<< highest_min_breakpoint << endl;
+	}
 
 	// Anchor dimension
 	L[a] = -1;
@@ -1340,10 +1369,26 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 		if (i == a) {
 			i = (i + 1) % dim;
 		}
+
+		SLOPE_TYPE max_diff = -INF;
+
+		// Feature: prioritise dimension
+		for (int j = 0; j < dim; j++) {
+			SLOPE_TYPE diff = abs(slope_to_ratio(H[j]) - slope_to_ratio(L[j]));
+			if (diff >= max_diff) {
+				max_diff = diff;
+				i = j;
+			}
+			if (DEBUG) { 
+				cout << "Max difference is " << max_diff << endl;
+				cout << "Difference is " << diff << endl;
+			}
+		}
+
 		if (DEBUG) {cout << "This is breakpoint round for dimension " << i << endl; }
         point_t** points_to_display = breakpoint_one_round(P, s, L[i], H[i], a, i);
 
-		// skip iteration if random set not found
+		// Skip iteration if random set not found
 		if (points_to_display == nullptr) {
 			Qcount++;
 			i = (i + 1) % dim;
@@ -1394,15 +1439,15 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 		i = (i + 1) % dim;
 	}
 
-	// convert from slope to ratio
+	// Convert from slope to ratio
 	for (int i = 0; i < dim; i++) {
 		L[i] = slope_to_ratio(L[i]);
-		// prevent negative infinity H[i] bound
+		// Prevent negative infinity H[i] bound
 		if (H[i] == 0) { H[i] = INF; }
 		else { H[i] = slope_to_ratio(H[i]); }
 	}
 
-	// debug block
+	// Debug block
 	cout << "Last debug print block" << endl;
 	for (int i = 0; i < dim; i++) {
 		cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
@@ -1410,7 +1455,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 		cout << "H[" << i << "] = " << H[i] << endl;
 	}
 
-    // find the highest value from the low-end of the user utilities
+    // Find the highest value from the low-end of the user utilities
     double highest = 0.0;
     for (int j = 0; j < P->numberOfPoints; ++j)
     {
@@ -1421,7 +1466,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         	highest = dot;
     }
 
-    // prune all the points that have their high-end utility (1+epsilon) dominated
+    // Prune all the points that have their high-end utility (1+epsilon) dominated
 	vector<int> C_idx;
     C_idx.clear();
     for (int j = 0; j < P->numberOfPoints; ++j)

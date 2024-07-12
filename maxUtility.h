@@ -44,6 +44,5 @@ double random_fake(point_set_t* P, point_t* u, int s,  double epsilon, double de
 
 // the main interactive breakpoint algorithm for real points
 double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
-double max_utility_breakpoint_new(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 
 #endif
