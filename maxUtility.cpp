@@ -947,7 +947,9 @@ double max_utility(point_set_t* P, point_t* u, int s,  double epsilon, double de
 	}
 	if (C_idx.size() - inI > 0)
 	  avg_effective_epsilon /= C_idx.size() - inI;
-	printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf.; max effective epsilon was %lf\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
+	
+	if (DEBUG)
+		printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf.; max effective epsilon was %lf\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
 
 	// get the final result 
 	point_t* result = P->points[get_current_best_pt(P, C_idx, ext_vec)];
@@ -1152,7 +1154,10 @@ double max_utility_fake(point_set_t* P, point_t* u, int s,  double epsilon, doub
     }
   if (C_idx.size() - inI > 0)
     avg_effective_epsilon /= C_idx.size() - inI;
-  printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
+
+	if (DEBUG) {
+		printf("Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha, avg_effective_epsilon, max_effective_epsilon);
+	}
   Csize = C_idx.size();
 
   return alpha;
@@ -1448,11 +1453,13 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 	}
 
 	// Debug block
-	cout << "Last debug print block" << endl;
-	for (int i = 0; i < dim; i++) {
-		cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
-		cout << "L[" << i << "] = " << L[i] << endl;
-		cout << "H[" << i << "] = " << H[i] << endl;
+	if (DEBUG) {
+		cout << "Last debug print block" << endl;
+		for (int i = 0; i < dim; i++) {
+			cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
+			cout << "L[" << i << "] = " << L[i] << endl;
+			cout << "H[" << i << "] = " << H[i] << endl;
+		}
 	}
 
     // Find the highest value from the low-end of the user utilities
@@ -1507,7 +1514,8 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         }
     if (C_idx.size() - inI > 0)
         avg_effective_epsilon /= C_idx.size() - inI;
-    printf("Breakpoint - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+	if (DEBUG)
+    	printf("Breakpoint - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
     Csize = C_idx.size();
 
     return alpha_approx;
@@ -1654,11 +1662,13 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 	}
 
 	// Debug block
-	cout << "Last debug print block" << endl;
-	for (int i = 0; i < dim; i++) {
-		cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
-		cout << "L[" << i << "] = " << L[i] << endl;
-		cout << "H[" << i << "] = " << H[i] << endl;
+	if (DEBUG) {
+		cout << "Last debug print block" << endl;
+		for (int i = 0; i < dim; i++) {
+			cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
+			cout << "L[" << i << "] = " << L[i] << endl;
+			cout << "H[" << i << "] = " << H[i] << endl;
+		}
 	}
 
     // Find the highest value from the low-end of the user utilities
@@ -1713,7 +1723,9 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
         }
     if (C_idx.size() - inI > 0)
         avg_effective_epsilon /= C_idx.size() - inI;
-    printf("Breakpoint - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+	if (DEBUG) {
+		printf("Breakpoint - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+	}
     Csize = C_idx.size();
 
     return alpha_approx;
@@ -1914,7 +1926,9 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
         }
     if (C_idx.size() - inI > 0)
         avg_effective_epsilon /= C_idx.size() - inI;
-    printf("TT - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+	if (DEBUG) {
+		printf("TT - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+	}
     Csize = C_idx.size();
 
     return alpha_approx;
