@@ -1400,6 +1400,212 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 			continue;
 		}
 
+		// if (DEBUG) { cout << "User utility: (" << u->coord[a] << ", " << u->coord[i] << ")" << endl; }
+
+		// // Check if we can access points_to_display as wanted
+		// if (DEBUG) {
+		// 	for (int j = 0; j < s; j++) {
+		// 		cout << "Point to display is (" << points_to_display[j]->coord[a] << ", " 
+		// 										<< points_to_display[j]->coord[i] << ")" 
+		// 			<< " with utility " << u->coord[a] * points_to_display[j]->coord[a] + u->coord[i] * points_to_display[j]->coord[i] 
+		// 			<< endl;
+		// 	}
+		// }
+
+		// Simulate user interaction, user picks their favorite 
+		double max_value = 0;
+		int best_index = 0;
+		for (int j = 0; j < s; j++) {
+			double value = u->coord[a] * points_to_display[j]->coord[a] + u->coord[i] * points_to_display[j]->coord[i];
+			if (value > max_value) {
+				max_value = value;
+				best_index = j;
+			}
+		}
+
+		// if (DEBUG) { cout << "Best point found correctly at index " << best_index << endl; }
+
+		SLOPE_TYPE 		X[] = {L[i], compute_slope(points_to_display[0], points_to_display[1], a, i), H[i]};
+		
+		// Update L[i] and H[i]
+		L[i] = X[best_index];
+		H[i] = X[best_index + 1];
+
+		// if (DEBUG) {
+		// 	for (int i = 0; i < dim; i++) {
+		// 		cout << "Real slope for dimension " << i << " is: " << ratio_to_slope(u->coord[i]/u->coord[a]) << endl;
+		// 		cout << "L[" << i << "] = " << L[i] << endl;
+		// 		cout << "H[" << i << "] = " << H[i] << endl;
+		// 	}
+		// }
+
+		// Finish one round
+		Qcount++;
+		i = (i + 1) % dim;
+	}
+
+	// Convert from slope to ratio
+	for (int i = 0; i < dim; i++) {
+		L[i] = slope_to_ratio(L[i]);
+		// Prevent negative infinity H[i] bound
+		if (H[i] == 0) { H[i] = INF; }
+		else { H[i] = slope_to_ratio(H[i]); }
+	}
+
+	// debug block
+	cout << "Last debug print block" << endl;
+	for (int i = 0; i < dim; i++) {
+		cout << "Real ratio for dimension " << i << " is: " << u->coord[i]/u->coord[a] << endl;
+		cout << "L[" << i << "] = " << L[i] << endl;
+		cout << "H[" << i << "] = " << H[i] << endl;
+	}
+
+    // Find the highest value from the low-end of the user utilities
+    double highest = 0.0;
+    for (int j = 0; j < P->numberOfPoints; ++j)
+    {
+        double dot = 0.0;
+        for(int k = 0; k < dim; ++k)
+        	dot += P->points[j]->coord[k] * L[k];
+        if (dot > highest)
+        	highest = dot;
+    }
+
+    // Prune all the points that have their high-end utility (1+epsilon) dominated
+	vector<int> C_idx;
+    C_idx.clear();
+    for (int j = 0; j < P->numberOfPoints; ++j)
+    {
+        double dot = 0.0;
+        for(int k = 0; k < dim; ++k)
+        	dot += P->points[j]->coord[k] * H[k];
+        if (dot * (1 + epsilon) >= highest)
+        	C_idx.push_back(j);
+    }
+
+    // Find out how well this did:
+    double max_value = 0;
+    for(int i = 0; i < P->numberOfPoints; i++)
+    {
+        double value = dot_prod(u, P->points[i]);
+        if(value > max_value)
+        	max_value = value;
+    }
+
+    int inI = 0;
+    double alpha_approx = 0.0;
+    double avg_effective_epsilon = 0.0, max_effective_epsilon = 0.0;
+    for(int i = 0; i < C_idx.size(); i++)
+        {
+        double value = dot_prod(u, P->points[C_idx[i]]);
+        if(value * (1 + epsilon) > max_value)
+        	inI++;
+        else
+        {
+        avg_effective_epsilon += max_value/value - 1.0;
+        if (max_value/value - 1.0 > max_effective_epsilon)
+            max_effective_epsilon = max_value/value - 1.0;
+
+        if (max_value - value * (1 + epsilon) > alpha_approx)
+            alpha_approx = max_value - value * (1 + epsilon);
+        }
+        }
+    if (C_idx.size() - inI > 0)
+        avg_effective_epsilon /= C_idx.size() - inI;
+    printf("Breakpoint - Found %d in I; %d false positives; alpha was %lf; avg effective epsilon was %lf; max effective epsilon was %lf.\n", inI, C_idx.size() - inI, alpha_approx, avg_effective_epsilon, max_effective_epsilon);
+    Csize = C_idx.size();
+
+    return alpha_approx;
+}
+
+//==============================================================================================
+// Copy of max_utility_breakpoint_for_vary_T
+// Description:
+//      Simulate interaction with multiple rounds of interaction and 2-dimensional tuples
+//      2 dimensions and s = 2
+// Parameters: 
+//      P           - input data set
+//      u           - unknown utility vector
+//      s           - number of points to display each round
+//      maxRound    - maximum number of rounds of interactions / budget of questions
+// Return:
+//      alpha       - approximation
+//==============================================================================================
+double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize, int repeats) {
+    // Set up 
+	Qcount = 0;
+    int dim = P->points[0]->dim;
+
+	// Anchor dimension
+	int a = 0;		
+
+	// Initialize L and H slope bounds
+	vector<double> L(dim, -INF), H(dim, 0);
+
+	// Feature: Correlation check
+	int highest_min_breakpoint = -INF;
+
+	for (int i = 0; i < dim; i++) {
+		int min_breakpoint = INF;
+		for (int j = 0; j < dim; j++) {
+			if (i == j) {
+				continue;
+			}
+			int num_breakpoint = count_slopes(P, -INF, 0, true, i, j);
+			if (num_breakpoint < min_breakpoint) {
+				min_breakpoint = num_breakpoint;
+			}
+		if (DEBUG) {
+			cout << "Min breakpoint for dimension " << i << " with dimension " << j << " is " << min_breakpoint << endl;
+		}
+		}
+		if (min_breakpoint > highest_min_breakpoint) {
+			highest_min_breakpoint = min_breakpoint;
+
+			// Set anchor dimension to current dimension
+			a = i;
+		}
+	}
+	if (DEBUG) {
+		cout << "Anchor dimension is " << a  << " because it has the highest number of breakpoints of " 
+			<< highest_min_breakpoint << endl;
+	}
+
+	// Anchor dimension
+	L[a] = -1;
+	H[a] = -1;
+
+	int i = 0;
+    while(Qcount < maxRound) {
+		if (i == a) {
+			i = (i + 1) % dim;
+		}
+
+		SLOPE_TYPE max_diff = -INF;
+
+		// Feature: prioritise dimension
+		for (int j = 0; j < dim; j++) {
+			SLOPE_TYPE diff = abs(slope_to_ratio(H[j]) - slope_to_ratio(L[j]));
+			if (diff >= max_diff) {
+				max_diff = diff;
+				i = j;
+			}
+			if (DEBUG) { 
+				cout << "Max difference is " << max_diff << endl;
+				cout << "Difference is " << diff << endl;
+			}
+		}
+
+		if (DEBUG) {cout << "This is breakpoint round for dimension " << i << endl; }
+        point_t** points_to_display = breakpoint_one_round(P, s, L[i], H[i], a, i, repeats);
+
+		// Skip iteration if random set not found
+		if (points_to_display == nullptr) {
+			Qcount++;
+			i = (i + 1) % dim;
+			continue;
+		}
+
 		if (DEBUG) { cout << "User utility: (" << u->coord[a] << ", " << u->coord[i] << ")" << endl; }
 
 		// Check if we can access points_to_display as wanted
@@ -1802,7 +2008,7 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 
 	// Simulate user interaction, user picks their preference 
 	while (i < dim){
-		pt1_utility = u->coord[i_star] * min_dim_values[i_star] + u->coord[i] * p->coord[i];
+		pt1_utility = (u->coord[i_star] * min_dim_values[i_star])+ (u->coord[i] * p->coord[i]);
 		pt1_utility = (u->coord[i_star] * (min_dim_values[i_star] + a)) + (u->coord[i] * (p->coord[i] - a));
 
 		if (pt1_utility < pt1_utility){
@@ -1822,11 +2028,13 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 
 	// Line 8
 	Qcount = 0;
-	vector<double> b(dim);					// desired ratio breakpoint
-	vector<double> b_hat(dim);				// desired slope breakpoint
+	double b;					// desired ratio breakpoint
+	double b_hat;				// desired slope breakpoint
 	double width;
 	double height;
-	point_t* p_new;
+	point_t* p_new= new point_t;
+	p_new -> dim = dim;
+    p_new -> coord = new double[dim];
 
 	// Line 8
 	i = 0;
@@ -1834,42 +2042,84 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 		if (i == i_star){
 			i = (i + 1) % dim;
 		}
+
+		if (DEBUG){
+			cout << "New while iteration, i= " << i << ", Qcount= " << Qcount << endl;
+		}
 		
-		b[i] = L[i] + ((L[i] - H[i])/2);
-		b_hat[i] = (-1/b[i]);
+		if (DEBUG){
+			cout << "Beginning Lower bound L[" << i << "] of utility: " << L[i] << endl;
+			cout << "Beginning Higher bound H[" << i << "] of utility: " << H[i] << endl;
+		}
+
+		b = L[i] + ((H[i] - L[i])/2); 
+		b_hat= (-1/b);
+
+		if (DEBUG){
+			cout << "ratio breakpoint b: " << b << endl;
+			cout << "ratio breakpoint b_hat: " << b_hat << endl;
+		}
 
 		// Line 13
 		width = p -> coord[i_star] - min_dim_values[i_star];
+		if (DEBUG){
+			cout << "Width: " << width << endl;
+		}
 		height = p -> coord[i] - min_dim_values[i];
+		if (DEBUG){
+			cout << "Height: " << height << endl;
+		}
 
 		// Line 14
-		if (p -> coord[i] + (width * b_hat[i]) < min_dim_values[i]){
-			p_new -> coord[0] = (p -> coord[i_star] - (height/b_hat[i]));
-			p_new -> coord[1] = (p -> coord[i] - height);
+		if (p -> coord[i] + (width * b_hat) < min_dim_values[i]){
+			p_new -> coord[i] = (p -> coord[i_star] - (height/b_hat));
+			p_new -> coord[i_star] = (p -> coord[i] - height);
 		} else {
-			p_new -> coord[0] = (p -> coord[i_star] + width);
-			p_new -> coord[1] = (p -> coord[i] + (width * b_hat[i]));
+			p_new -> coord[i] = (p -> coord[i_star] + width);
+			p_new -> coord[i_star] = (p -> coord[i] + (width * b_hat));
 		}
 
 		double p_utility;
 		double p_new_utility;
+		cout << "p: (" << p -> coord[i_star] << "," << p -> coord[i] << ")" << endl;
+		cout << "p_new: (" << p_new -> coord[i_star] << "," << p_new -> coord[i] << ")" << endl;
 
 		// Line 18
 		// Simulate user interaction, user picks their preference 
 		p_utility = u->coord[i_star] * min_dim_values[i_star] + u->coord[i] * p->coord[i];
-		p_new_utility = (u->coord[i_star] * p_new -> coord[0]) + (u->coord[i] * p_new -> coord[1]);
+		p_new_utility = (u->coord[i_star] * p_new -> coord[i_star]) + (u->coord[i] * p_new -> coord[i]);
+		if (DEBUG){
+			cout << "Utility of p: " << p_utility << endl;
+			cout << "Utility of p_new: " << p_new_utility << endl;
+		}
 
 
 		// Line 19 -22
 		if (p_utility > p_new_utility){
-			L[i] = b[i];
-		} else {
-			H[i] = b[i];
+			L[i] = b;
+			if (DEBUG){
+				cout << "P was chosen, Updated L[i] to :" << L[i] << endl;
+			}
+		} 
+		else {
+			H[i] = b;
+			if (DEBUG){
+				cout << "P_new was chosen, Updated H[i] to :" << H[i] << endl;
+			}
 		}
 		
 		// Line 23
 		i = (i + 1) % dim;
 		Qcount++;
+	}
+	delete[] p_new->coord;
+    delete p_new;
+
+	if(DEBUG){
+		for (int i = 0; i < dim; i++){
+			cout << "Lower bound L[" << i << "] of utility: " << L[i] << endl;
+			cout << "Higher bound H[" << i << "] of utility: " << H[i] << endl;
+		}
 	}
 
 	// Line 24 - 30
