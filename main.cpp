@@ -325,10 +325,10 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   double alpha, avg_alpha[6][100];
   int REPEATS = 10; // number of times to repeat experiment
   int SQUEEZEU = 0, TT = 1 , UHRAND = 2, MIN_D = 3, MIN_R = 4, BREAKPOINT = 5;
-  int MIN_Q = 5, MAX_Q = 15; // MAX < 100
+  int MIN_Q = 5, MAX_Q = 80; // MAX < 100
   int reps = 10; // number of times needed my MinR and MinC
 
-  for(q = MIN_Q; q <= MAX_Q; q += 2)
+  for(q = MIN_Q; q <= MAX_Q; q += 5)
     {
       cout << "q = " << q << endl;
       avg_alpha[SQUEEZEU][q] = 0.0;
@@ -382,7 +382,7 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   sprintf(filename, "output/vary-q-%d-%d-e%lf-d%lf-s%d-%d.dat", dim, P->numberOfPoints, epsilon, delta, s, time(NULL));
   FILE* fp = fopen(filename, "w");
 
-  for(q = MIN_Q; q <= MAX_Q; q += 2)
+  for(q = MIN_Q; q <= MAX_Q; q += 5)
     {
       printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", q, avg_alpha[SQUEEZEU][q], avg_alpha[TT][q], avg_alpha[UHRAND][q], avg_alpha[MIN_D][q], avg_alpha[MIN_R][q], avg_alpha[BREAKPOINT][q]);
       fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", q, avg_alpha[SQUEEZEU][q], avg_alpha[TT][q], avg_alpha[UHRAND][q], avg_alpha[MIN_D][q], avg_alpha[MIN_R][q], avg_alpha[BREAKPOINT][q]);
@@ -892,16 +892,17 @@ void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   int dom_option = HYPER_PLANE;
   int stop_option = EXACT_BOUND;
   int cmp_option;
-  double alpha, avg_alpha[5][100];
-  int REPEATS = 10;
+  double alpha, avg_alpha[5][10000];
+  int REPEATS = 500;
   int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
-  int MIN_T = 10, MAX_T = 100; // MAX_S < 100
+  int MIN_T = 10, MAX_T = 500; // MAX_S < 100
 
-  for(int T = MIN_T; T <= MAX_T; T += 20)
+  for(int T = MIN_T; T <= MAX_T; T += 10)
   {
     cout << "T = " << T << endl;
     avg_alpha[MIN_D][T] = 0.0;
     avg_alpha[MIN_R][T] = 0.0;
+    avg_alpha[Breakpoint][T] = 0.0;
 
     for(int repeat = 0; repeat < REPEATS; ++repeat)
     {
@@ -916,11 +917,14 @@ void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double de
       for (int i = 0; i < dim; i++)
 	u->coord[i] /= max_u;
       
-      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, T);
-      avg_alpha[MIN_D][T] += alpha/REPEATS;
+      //alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, T);
+      //avg_alpha[MIN_D][T] += alpha/REPEATS;
 
-      alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, T);
-      avg_alpha[MIN_R][T] += alpha/REPEATS;
+      //alpha = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, T);
+      //avg_alpha[MIN_R][T] += alpha/REPEATS;
+
+      alpha = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize, T);
+      avg_alpha[Breakpoint][T] += alpha/REPEATS;
     }
   }
 
@@ -930,8 +934,8 @@ void run_vary_T(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
   for(int T = MIN_T; T <= MAX_T; T += 20)
     {
-      printf("%d\t%lf\t%lf\n", T, avg_alpha[MIN_D][T], avg_alpha[MIN_R][T]);
-      fprintf(fp, "%d\t%lf\t%lf\n", T, avg_alpha[MIN_D][T], avg_alpha[MIN_R][T]);
+      printf("%d\t%lf\n", T, avg_alpha[Breakpoint][T]);
+      fprintf(fp, "%d\t%lf\n", T, avg_alpha[Breakpoint][T]);
     }
   fclose(fp);
 

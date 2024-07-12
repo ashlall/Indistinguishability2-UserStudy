@@ -294,7 +294,80 @@ point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta,
 
     int             min_V       = INF;
 
-    for (int j = 0; j < 1000; j++) {
+    for (int j = 0; j < 100; j++) {
+        // generate random set of points
+        for (int i = 0; i < s; i++) {
+            S[i] = P -> points[rand() % (P -> numberOfPoints)];
+        }
+
+        // sort randomly sampled points in descending order
+        sort(S, S + s, Comparator_X_Reverse(dim_a, dim_i));
+
+        // compute slope
+        SLOPE_TYPE slope_S = compute_slope(S[0], S[1], dim_a, dim_i);
+
+        // line 14
+        if (slope_S > alpha && slope_S < beta) {
+            good_samples++;
+
+            SLOPE_TYPE      X[] = {alpha, slope_S, beta};
+
+            // line 15
+            int num_slopes_S = count_slopes(P, alpha, slope_S, true, dim_a, dim_i);
+
+            // reset V 
+            int V = abs(num_slopes_S - total_slopes/s);
+
+            // maintain set S that minimizes V
+            if (V < min_V) {
+                // update min_V
+                min_V = V;
+
+                found_best = true;
+                for (int i = 0; i < s; i++) {
+                    S_best[i] = S[i];
+                }
+            }
+        }
+    }
+
+    if (DEBUG) {
+        cout << "The number of satisfying samples is " << good_samples << endl; 
+    }
+
+    // Copy the result to a dynamically allocated array to return
+    if (found_best) { 
+        point_t** result = new point_t*[s];
+        for (int i = 0; i < s; ++i) {
+            result[i] = S_best[i];
+        }
+
+        return result;
+    }   
+    else {
+        return nullptr;
+    }
+}
+
+// Extra version to test vary T     
+//      repeats         - number of samples
+
+point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i, int repeats) 
+{
+    // calculate total slope between alpha and beta
+    int total_slopes = count_slopes(P, alpha, beta, true, dim_a, dim_i);
+    
+    // sampling set up
+    bool            found_best  = false;
+    int             good_samples = 0;
+
+    // array of pointers, not dynamically allocated
+    point_t*        S[s]; 
+    point_t*        S_best[s];    
+
+    int             min_V       = INF;
+
+    for (int j = 0; j < repeats; j++) {
         // generate random set of points
         for (int i = 0; i < s; i++) {
             S[i] = P -> points[rand() % (P -> numberOfPoints)];
