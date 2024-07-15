@@ -28,6 +28,7 @@ def main():
         elif filename[:10] == "vary-delta":
             out.write("set xlabel 'delta'\n")
         elif filename[:6] == "vary-n" or filename.startswith("scalability-vary-n-alpha"):
+            out.write("set logscale x\n")
             out.write("set xlabel 'n'\n")
         out.write("set ylabel 'alpha'\n")
 
