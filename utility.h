@@ -40,6 +40,11 @@ int                     count_slopes            (point_set_t* P, double alpha, d
 point_t**               breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i);
 double                  max_utility_breakpoint  (point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize);
 
+
+// Strongly truthful test vary T
+point_t**               breakpoint_one_round    (point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i, int repeats);
+double                  max_utility_breakpoint  (point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize, int repeats);
+
 #endif
 
 
