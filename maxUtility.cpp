@@ -1874,8 +1874,10 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 
 		double p_utility;
 		double p_new_utility;
-		cout << "p: (" << p -> coord[i_star] << "," << p -> coord[i] << ")" << endl;
-		cout << "p_new: (" << p_new -> coord[i_star] << "," << p_new -> coord[i] << ")" << endl;
+		if (DEBUG) {
+			cout << "p: (" << p -> coord[i_star] << "," << p -> coord[i] << ")" << endl;
+			cout << "p_new: (" << p_new -> coord[i_star] << "," << p_new -> coord[i] << ")" << endl;
+		}
 
 		// Line 18
 		// Simulate user interaction, user picks their preference 
