@@ -1755,6 +1755,7 @@ double max_utility_breakpoint(point_set_t* P, point_t* u, int s,  double epsilon
 //==============================================================================================
 double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double delta, int maxRound, int &Qcount, int &Csize) {	
 	// number of dimensions
+	Qcount = 0;
 	int dim = P->points[0]->dim;
 
 	double min_dim_values[dim]; 
@@ -1852,6 +1853,7 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 		
 		// line 7
 		i = i + 1;
+		Qcount = Qcount+1;
 	}
 
 	// line 8: for each dim, initialize L_i and H_i, set i* bounds to 1
@@ -1859,7 +1861,6 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 	L[i_star] = 1;
 	H[i_star] = 1;
 
-	Qcount = 0;
 	double b;					// desired ratio breakpoint
 	double b_hat;				// desired slope breakpoint
 	double width;

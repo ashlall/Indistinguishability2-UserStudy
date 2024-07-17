@@ -17,7 +17,8 @@
 #define	MAX_FILENAME_LENG	256
 
 #define DEBUG 0
-#define DEBUG1 1
+#define DEBUG1 0 // for max_utility_Tt
+#define DEBUG2 0 // prints out Li and Hi for Squeeze-u and tt
 
 #define CONFIG_FILE	"rtree.config"
 #define SAVE_RTREE_FILE "save_rtree_file"
