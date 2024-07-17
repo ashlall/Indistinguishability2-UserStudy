@@ -17,8 +17,7 @@ COORD_TYPE ratio_to_slope   (COORD_TYPE r) {
 //==============================================================================================
 // compute_slope
 // Computes the slope between points p1 and p2
-// Parameters:
-//      p1 - point 1
+// Parameters://      p1 - point 1
 //      p2 - point 2
 // Return: 
 //      Slope between p1 and p2 
@@ -243,85 +242,6 @@ int count_slopes(point_set_t* P, double alpha, double beta, bool adjust, int dim
 //=============================== ALGORITHMS ================================
 
 //==============================================================================================
-// breakpoint_one_round
-// Helper function for breakpoint - Simulate one round of interaction
-// 2 dimensions and s = 2
-// Parameters: 
-//      P           - input data set
-//      s           - number of options in one round
-//      alpha       - lower slope threshold 
-//      beta        - upper slope threshold
-//      dim_a       - anchor dimension
-//      dim_i       - dimension
-// Return:
-//      slope of the most even breakpoint
-//==============================================================================================
-
-SLOPE_TYPE breakpoint_one_round(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i) {
-    // calculate total slope between alpha and beta
-    int total_slopes = count_slopes(P, alpha, beta, true, dim_a, dim_i);
-    int mid = total_slopes / 2;
-    // round up
-    if (total_slopes % 2 != 0){
-        mid++;             
-    }
-
-    // if (DEBUG) {
-    //     cout << "alpha in breakpoint one round: " << alpha << endl;
-    //     cout << "beta in breakpoint one round: " << beta << endl;
-    //     cout << "total slopes in breakpoint one round: " << total_slopes << endl;
-    //     cout << "half slopes in breakpoint one round: " << mid << endl;
-    // }
-    
-    // sampling set up
-    bool found_best = false;
-    point_t* S[s];   
-    point_t* S_best[s];
-
-    srand (time(NULL));
-    SLOPE_TYPE current_slope;
-    int current_slope_count;        
-    double min_difference = INF;
-    SLOPE_TYPE best_slope;
-
-    for (int j = 0; j < 10000; j++){
-        // generate random set of points
-        for (int i = 0; i < s; i++) {
-            S[i] = P -> points[rand() % (P -> numberOfPoints)];
-        }
-        current_slope = compute_slope(S[0], S[1], dim_a, dim_i);  
-
-        // check if slope within range
-        if (current_slope >= alpha && current_slope <= beta){
-            current_slope_count = count_slopes(P, alpha, current_slope, true, dim_a, dim_i); 
-
-            if (current_slope_count == mid){
-                for (int i = 0; i < s; i++) {
-                        S_best[i] = S[i];
-                }
-                break;
-            }
-            else if (abs(current_slope_count - mid) < min_difference){
-                    // update min_difference and its set of points
-                    found_best = true;
-                    min_difference = abs(current_slope_count - mid);
-                    for (int i = 0; i < s; i++) {
-                        S_best[i] = S[i];
-                    }
-            }    
-        }
-    }
-    // prevent segmentation fault
-    if (found_best) {
-        best_slope = compute_slope(S_best[0], S_best[1], dim_a, dim_i); 
-        return best_slope;
-    }
-    else {
-        return alpha;   
-    }
-}
-
-//==============================================================================================
 // Helper function for comparison in sampled set
 //==============================================================================================
 
@@ -346,7 +266,7 @@ struct Comparator_X_Reverse {
 //=============================== ALGORITHMS ================================
 
 //==============================================================================================
-// breakpoint_one_round_new
+// breakpoint_one_round
 // Helper function for breakpoint - Simulate one round of interaction
 // Parameters: 
 //      P           - input data set
@@ -359,18 +279,10 @@ struct Comparator_X_Reverse {
 //      array of pointers to points to display
 //==============================================================================================
 
-point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i) 
+point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i) 
 {
     // calculate total slope between alpha and beta
     int total_slopes = count_slopes(P, alpha, beta, true, dim_a, dim_i);
-    
-
-    // if (DEBUG) {
-    //     cout << "alpha in breakpoint one round: " << alpha << endl;
-    //     cout << "beta in breakpoint one round: " << beta << endl;
-    //     cout << "total slopes in breakpoint one round: " << total_slopes << endl;
-    //     cout << "half slopes in breakpoint one round: " << mid << endl;
-    // }
     
     // sampling set up
     bool            found_best  = false;
@@ -380,81 +292,36 @@ point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double b
     point_t*        S[s]; 
     point_t*        S_best[s];    
 
-    SLOPE_TYPE      Slope[s-1]; 
-    SLOPE_TYPE      min_slope           = INF;
-    SLOPE_TYPE      max_slope           = -INF;   
-    int             max_slope_count     = 0;  
-    int             current_slope_count = 0;
-
-    SLOPE_TYPE      X[s+1];
-    int             B[s];
-    int             V           = 0;
     int             min_V       = INF;
-    vector<SLOPE_TYPE>      X_best;
 
-    for (int j = 0; j < 10000; j++) {
-        // reset min slope and max slope
-        min_slope = INF;
-        max_slope = -INF;
-        current_slope_count = 0;
-
+    for (int j = 0; j < 100; j++) {
         // generate random set of points
         for (int i = 0; i < s; i++) {
             S[i] = P -> points[rand() % (P -> numberOfPoints)];
         }
 
-        // sort randomlyl sampled points in descending order
+        // sort randomly sampled points in descending order
         sort(S, S + s, Comparator_X_Reverse(dim_a, dim_i));
 
-        for (int i = 0; i < s-1; i++) {
-            Slope[i] = compute_slope(S[i], S[i+1], dim_a, dim_i);
-            if (Slope[i] < min_slope) {
-                min_slope = Slope[i];
-            }
-            if (Slope[i] > max_slope) {
-                max_slope = Slope[i];
-            }
-            if (Slope[i] > alpha && Slope[i] < beta) {
-                current_slope_count++;
-            }
-        }
-
-        if (current_slope_count > max_slope_count) {
-            max_slope_count = current_slope_count;
-        }
+        // compute slope
+        SLOPE_TYPE slope_S = compute_slope(S[0], S[1], dim_a, dim_i);
 
         // line 14
-        if ((min_slope > alpha && max_slope < beta)) {
+        if (slope_S > alpha && slope_S < beta) {
             good_samples++;
 
-            X[0] = alpha;
-            for (int i = 0; i < s-1; i++) {
-                X[i+1] = Slope[i];
-            }
-            X[s] = beta;
+            SLOPE_TYPE      X[] = {alpha, slope_S, beta};
 
             // line 15
-            for (int i = 0; i < s; i++) {
-                B[i] = count_slopes(P, X[i], X[i+1], true, dim_a, dim_i);
-            }
+            int num_slopes_S = count_slopes(P, alpha, slope_S, true, dim_a, dim_i);
 
             // reset V 
-            V = 0;
-
-            // line 16
-            for (int i = 0; i < s; i++) {
-                V += abs(B[i] - total_slopes/s);
-            }
+            int V = abs(num_slopes_S - total_slopes/s);
 
             // maintain set S that minimizes V
             if (V < min_V) {
                 // update min_V
                 min_V = V;
-
-                // reset X_best
-                if (!X_best.empty()) {
-                    X_best.clear();
-                }
 
                 found_best = true;
                 for (int i = 0; i < s; i++) {
@@ -464,7 +331,82 @@ point_t** breakpoint_one_round_new(point_set_t* P, int s, double alpha, double b
         }
     }
 
-    cout << "The number of satisfying samples is " << good_samples << endl; 
+    if (DEBUG) {
+        cout << "The number of satisfying samples is " << good_samples << endl; 
+    }
+
+    // Copy the result to a dynamically allocated array to return
+    if (found_best) { 
+        point_t** result = new point_t*[s];
+        for (int i = 0; i < s; ++i) {
+            result[i] = S_best[i];
+        }
+
+        return result;
+    }   
+    else {
+        return nullptr;
+    }
+}
+
+// Extra version to test vary T     
+//      repeats         - number of samples
+
+point_t** breakpoint_one_round(point_set_t* P, int s, double alpha, double beta, int dim_a, int dim_i, int repeats) 
+{
+    // calculate total slope between alpha and beta
+    int total_slopes = count_slopes(P, alpha, beta, true, dim_a, dim_i);
+    
+    // sampling set up
+    bool            found_best  = false;
+    int             good_samples = 0;
+
+    // array of pointers, not dynamically allocated
+    point_t*        S[s]; 
+    point_t*        S_best[s];    
+
+    int             min_V       = INF;
+
+    for (int j = 0; j < repeats; j++) {
+        // generate random set of points
+        for (int i = 0; i < s; i++) {
+            S[i] = P -> points[rand() % (P -> numberOfPoints)];
+        }
+
+        // sort randomly sampled points in descending order
+        sort(S, S + s, Comparator_X_Reverse(dim_a, dim_i));
+
+        // compute slope
+        SLOPE_TYPE slope_S = compute_slope(S[0], S[1], dim_a, dim_i);
+
+        // line 14
+        if (slope_S > alpha && slope_S < beta) {
+            good_samples++;
+
+            SLOPE_TYPE      X[] = {alpha, slope_S, beta};
+
+            // line 15
+            int num_slopes_S = count_slopes(P, alpha, slope_S, true, dim_a, dim_i);
+
+            // reset V 
+            int V = abs(num_slopes_S - total_slopes/s);
+
+            // maintain set S that minimizes V
+            if (V < min_V) {
+                // update min_V
+                min_V = V;
+
+                found_best = true;
+                for (int i = 0; i < s; i++) {
+                    S_best[i] = S[i];
+                }
+            }
+        }
+    }
+
+    if (DEBUG) {
+        cout << "The number of satisfying samples is " << good_samples << endl; 
+    }
 
     // Copy the result to a dynamically allocated array to return
     if (found_best) { 
