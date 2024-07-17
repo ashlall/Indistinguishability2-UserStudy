@@ -330,7 +330,7 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
   for(q = MIN_Q; q <= MAX_Q; q += 5)
     {
-      cout << "q = " << q << endl;
+      // cout << "q = " << q << endl;
       avg_alpha[SQUEEZEU][q] = 0.0;
       avg_alpha[TT][q] = 0.0;
       avg_alpha[UHRAND][q] = 0.0;
