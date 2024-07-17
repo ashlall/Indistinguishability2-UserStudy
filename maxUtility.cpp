@@ -1160,7 +1160,7 @@ double max_utility_fake(point_set_t* P, point_t* u, int s,  double epsilon, doub
 	}
   Csize = C_idx.size();
 
-	if (DEBUG1){
+	if (DEBUG2){
 		cout << "*******************  SQUEEZE-U   *******************" << endl;
 		for (int i = 0; i < dim; i++){
 			cout << "Lower bound L[" << i << "] of utility: " << L[i] << endl;
@@ -1775,11 +1775,10 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 				current_min = P -> points[j] -> coord[i];
 			}
 			if (P -> points[j] -> coord[i] > current_max){
-				max_point = P -> points[j];					// save a point with max dim val
+				max_dim_points[i] = P -> points[j];					// save a point with max dim val
 				current_max = P -> points[j] -> coord[i];
 			}
 		min_dim_values[i] = current_min;
-		max_dim_points[i] = max_point;
 		}
 	}
 
@@ -1954,7 +1953,7 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
     delete p_new;
 	delete p;
 
-	if (DEBUG1){
+	if (DEBUG2){
 	cout << "*******************   TT   *******************" << endl;
 	for (int i = 0; i < dim; i++){
 		cout << "Lower bound L[" << i << "] of utility: " << L[i] << endl;
