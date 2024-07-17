@@ -196,21 +196,21 @@ void run_test(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
 	Isize++;
     }
 
-  //double alpha_SU = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
-  //double alpha_TT = max_utility_TT(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+  double alpha_SU = max_utility_fake(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+  double alpha_TT = max_utility_TT(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
   //double alpha_RF = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, RANDOM, stop_option, prune_option, dom_option, reps);
   //double alpha_MD = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MIND, stop_option, prune_option, dom_option, reps);
   //double alpha_MR = max_utility(cskyline, u, s, epsilon, delta, q, Qcount, Csize, MINR, stop_option, prune_option, dom_option, reps);
-  double alpha_BP = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
+  //double alpha_BP = max_utility_breakpoint(cskyline, u, s, epsilon, delta, q, Qcount, Csize);
 
 
-  // printf("%10s : %lf\n", "SqueezeU", alpha_SU);
-  // printf("%10s : %lf\n", "TT", alpha_TT);
+   printf("%10s : %lf\n", "SqueezeU", alpha_SU);
+   printf("%10s : %lf\n", "TT", alpha_TT);
 
   //printf("%10s : %lf\n", "RandomFake", alpha_RF);
   // printf("%10s : %lf\n", "MinD", alpha_MD);
   // printf("%10s : %lf\n", "MinR", alpha_MR);
-  printf("%10s : %lf\n", "Breakpoint", alpha_BP);
+  //printf("%10s : %lf\n", "Breakpoint", alpha_BP);
 
   release_point(u);
 }
@@ -305,8 +305,8 @@ void run_vary_s(point_set_t* P, point_set_t* cskyline, double epsilon, double de
 
   for(s = MIN_S; s <= MAX_S; s += 2)
   {
-    printf("%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
-    fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+    printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
+    fprintf(fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", s, avg_alpha[SQUEEZEU][s], avg_alpha[UHRAND][s], avg_alpha[MIN_D][s], avg_alpha[MIN_R][s], avg_alpha[Breakpoint][s]);
   }
   fclose(fp);
 
@@ -325,12 +325,12 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   double alpha, avg_alpha[6][100];
   int REPEATS = 10; // number of times to repeat experiment
   int SQUEEZEU = 0, TT = 1 , UHRAND = 2, MIN_D = 3, MIN_R = 4, BREAKPOINT = 5;
-  int MIN_Q = 5, MAX_Q = 80; // MAX < 100
+  int MIN_Q = 10, MAX_Q = 80; // MAX < 100
   int reps = 10; // number of times needed my MinR and MinC
 
   for(q = MIN_Q; q <= MAX_Q; q += 5)
     {
-      cout << "q = " << q << endl;
+      // cout << "q = " << q << endl;
       avg_alpha[SQUEEZEU][q] = 0.0;
       avg_alpha[TT][q] = 0.0;
       avg_alpha[UHRAND][q] = 0.0;
