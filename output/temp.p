@@ -1,10 +1,9 @@
-print 'vary-epsilon-2-63383-d0.000000-q6-s2'
+print 'vary-n-e0.050000-d0.000000-q9-s2'
 set terminal pdf size 4,3 enhanced font 'Arial,14' butt
 set size 1, 1
-set output 'vary-epsilon-2-63383-d0.000000-q6-s2.pdf'
+set output 'vary-n-e0.050000-d0.000000-q9-s2.pdf'
 set key inside top right
-set xlabel 'epsilon'
-set ylabel 'alpha'
 set logscale x
-set xrange [0.001:0.1]
-plot  'vary-epsilon-2-63383-d0.000000-q6-s2-1720468161.dat' using 1:4 title 'MinD' with linespoints, 'vary-epsilon-2-63383-d0.000000-q6-s2-1720468161.dat' using 1:5 title 'MinR' with linespoints, 'vary-epsilon-2-63383-d0.000000-q6-s2-1720468161.dat' using 1:2 title 'Squeeze-u' with linespoints, 'vary-epsilon-2-63383-d0.000000-q6-s2-1720468161.dat' using 1:3 title 'UH-Random' with linespoints, 'vary-epsilon-2-63383-d0.000000-q6-s2-1720468161.dat' using 1:6 title 'Breakpoint' with linespoints
+set xlabel 'n'
+set ylabel 'alpha'
+plot  'vary-n-e0.050000-d0.000000-q9-s2-1721270816.dat' using 1:2 title 'Squeeze-U' with linespoints, 'vary-n-e0.050000-d0.000000-q9-s2-1721270816.dat' using 1:3 title 'TT-Breakpoint' with linespoints, 'vary-n-e0.050000-d0.000000-q9-s2-1721270816.dat' using 1:4 title 'UH_Random' with linespoints, 'vary-n-e0.050000-d0.000000-q9-s2-1721270816.dat' using 1:5 title 'MinD' with linespoints, 'vary-n-e0.050000-d0.000000-q9-s2-1721270816.dat' using 1:6 title 'MinR' with linespoints, 'vary-n-e0.050000-d0.000000-q9-s2-1721270816.dat' using 1:7 title 'Breakpoint' with linespoints
