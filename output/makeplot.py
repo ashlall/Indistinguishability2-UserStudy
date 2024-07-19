@@ -42,7 +42,7 @@ def main():
         if filename[:6] == "vary-T":
             out.write("plot  '" + filename + "' using 1:2 title 'MinD' with linespoints, '" + filename + "' using 1:3 title 'MinR' with linespoints\n")
         else:
-            out.write("plot  '" + filename + "' using 1:2 title 'Squeeze-U' with linespoints, '" + filename + "' using 1:3 title 'TT-Breakpoint' with linespoints, '" + filename + "' using 1:4 title 'UH_Random' with linespoints, '" + filename + "' using 1:5 title 'MinD' with linespoints, '" + filename + "' using 1:6 title 'MinR' with linespoints, '" + filename + "' using 1:7 title 'Breakpoint' with linespoints\n")
+            out.write("plot  '" + filename + "' using 1:2 title 'Squeeze-U' with linespoints, '" + filename + "' using 1:3 title 'TT-Breakpoint' with linespoints, '" + filename + "' using 1:4 title 'UH-Random' with linespoints, '" + filename + "' using 1:5 title 'MinD' with linespoints, '" + filename + "' using 1:6 title 'MinR' with linespoints, '" + filename + "' using 1:7 title 'Breakpoint' with linespoints\n")
             
         out.close()
         os.system("gnuplot temp.p")

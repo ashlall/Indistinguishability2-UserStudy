@@ -1801,17 +1801,17 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 			cout << "Min value for dim" << i << ": " << min_dim_values[i] << endl;
 		}
 	}
-
+	
 	double a;
-	point* p= new point_t; // q in psuedocode, maintaining p to match prev code and pseudocode
-	p -> dim = dim;
-	p -> coord = new double[dim];
+	point_t* q= new point_t;
+	q -> dim = dim;
+    q -> coord = new double[dim];
 
 	// Simulate user interaction, user picks their preference to find i*
 	while (i < dim){
 		// line 4: find point p
-		p -> coord[i_star] = (max_dim_points[i_star]->coord[i_star]+ max_dim_points[i]->coord[i_star])/2;
-		p -> coord[i] = (max_dim_points[i_star]->coord[i]+ max_dim_points[i]->coord[i])/2;
+		q -> coord[i_star] = (max_dim_points[i_star]->coord[i_star]+ max_dim_points[i]->coord[i_star])/2;
+		q -> coord[i] = (max_dim_points[i_star]->coord[i]+ max_dim_points[i]->coord[i])/2;
 
 		if (DEBUG1){
 			cout << "Max point for dim " << i_star << ": (" << max_dim_points[i_star]->coord[i_star] << "," << max_dim_points[i_star]->coord[i] << ")" << endl;
@@ -1819,20 +1819,20 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 		}
 
 		// line 5: find a
-		if (p -> coord[i_star] - min_dim_values[i_star] < p -> coord[i] - min_dim_values[i]){
-			a = p -> coord[i_star] - min_dim_values[i_star];
+		if (q -> coord[i_star] - min_dim_values[i_star] < q -> coord[i] - min_dim_values[i]){
+			a = q -> coord[i_star] - min_dim_values[i_star];
 		} else {
-			a = p -> coord[i] - min_dim_values[i];
+			a = q -> coord[i] - min_dim_values[i];
 		}
 
 		// line 5: construct points to display to user to find i*, user will pick point with higher utility 'score'
-		double pt_i_utility = (u->coord[i_star] * min_dim_values[i_star])+ (u->coord[i] * p->coord[i]);
-		double pt_i_star_utility = (u->coord[i_star] * (min_dim_values[i_star] + a)) + (u->coord[i] * (p->coord[i] - a));
+		double pt_i_utility = (u->coord[i_star] * min_dim_values[i_star])+ (u->coord[i] * q->coord[i]);
+		double pt_i_star_utility = (u->coord[i_star] * (min_dim_values[i_star] + a)) + (u->coord[i] * (q->coord[i] - a));
 
 		if(DEBUG1){
 		cout << "a: " << a << endl;
-		cout << "p: (" << p -> coord[i_star] << "," << p -> coord[i] << ")" << endl;
-		cout << "p2: (" <<  min_dim_values[i_star] + a << "," << p -> coord[i] - a << ")" << endl;
+		cout << "p1: (" << q -> coord[i_star] << "," << q -> coord[i] << ")" << endl;
+		cout << "p2: (" <<  min_dim_values[i_star] + a << "," << q -> coord[i] - a << ")" << endl;
 		cout << "Utility of pt1_utility: " << pt_i_utility << endl;
 		cout << "Utility of pt2_utility: " << pt_i_star_utility << endl;
 		}
@@ -1865,6 +1865,9 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 	double b_hat;				// desired slope breakpoint
 	double width;
 	double height;
+	point* p= new point_t; // q in psuedocode, maintaining p to match prev code and pseudocode
+	p -> dim = dim;
+	p -> coord = new double[dim];
 	point_t* p_new= new point_t;
 	p_new -> dim = dim;
     p_new -> coord = new double[dim];
@@ -1874,9 +1877,16 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 		if (i == i_star){		// line 12
 			i = (i + 1) % dim;
 		}
-		// line 9: construct point p ("q" in pseudocode)
-		p -> coord[i_star] = (max_dim_points[i_star]->coord[i_star]+ max_dim_points[i]->coord[i_star])/2;
-		p -> coord[i] = (max_dim_points[i_star]->coord[i]+ max_dim_points[i]->coord[i])/2;
+		// line 9: construct point p ("q_i" in pseudocode)
+		//p -> coord[i_star] = (max_dim_points[i_star]->coord[i_star]+ max_dim_points[i]->coord[i_star])/2;
+
+		q -> coord[i_star] = (max_dim_points[i_star]->coord[i_star]+ max_dim_points[i]->coord[i_star])/2;
+		q -> coord[i] = (max_dim_points[i_star]->coord[i]+ max_dim_points[i]->coord[i])/2;
+
+		p -> coord[i_star] = (min_dim_values[i_star]);
+		p -> coord[i] = q -> coord[i];
+
+
 
 		if (DEBUG1){
 			cout << "***************** New while iteration, i= " << i << ", Qcount= " << Qcount << " ********************" << endl;
@@ -1895,22 +1905,22 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 			cout << "slope breakpoint b_hat: " << b_hat << endl;
 		}
 
-		width = p -> coord[i_star] - min_dim_values[i_star]; // line 16: find TT field width
+		width = q -> coord[i_star] - min_dim_values[i_star]; // line 16: find TT field width
 		if (DEBUG1){
 			cout << "Width: " << width << endl;
 		}
-		height = p -> coord[i] - min_dim_values[i];			// line 16: find TT field height
+		height = q -> coord[i] - min_dim_values[i];			// line 16: find TT field height
 		if (DEBUG1){
 			cout << "Height: " << height << endl;
 		}
 
 		// line 17: check if point intersects with horizonal line of TT field
-		if (p -> coord[i] + (width * b_hat) < min_dim_values[i]){
-			p_new -> coord[i_star] = (p -> coord[i_star] - (height/b_hat)); // line 18
-			p_new -> coord[i] = (p -> coord[i] - height);
+		if (q -> coord[i] + (width * b_hat) < min_dim_values[i]){
+			p_new -> coord[i_star] = (min_dim_values[i_star] - (height/b_hat)); // line 18 mini_star -(height/b_hat)
+			p_new -> coord[i] = (q -> coord[i] - height);
 		} else {
-			p_new -> coord[i_star] = (p -> coord[i_star] + width);			// line 20
-			p_new -> coord[i] = (p -> coord[i] + (width * b_hat));
+			p_new -> coord[i_star] = (min_dim_values[i_star] + width);			// line 20
+			p_new -> coord[i] = (q -> coord[i] + (width * b_hat));
 		}
 
 		double p_utility;
@@ -1950,9 +1960,11 @@ double max_utility_TT(point_set_t* P, point_t* u, int s,  double epsilon, double
 	delete[] max_point->coord;
 	delete[] p_new->coord;
 	delete[] p->coord;
+	delete[] q->coord;
 	delete max_point;
     delete p_new;
 	delete p;
+	delete q;
 
 	if (DEBUG2){
 	cout << "*******************   TT   *******************" << endl;
