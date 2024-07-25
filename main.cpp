@@ -226,7 +226,7 @@ void run_vary_s(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[5][100];
-  int REPEATS = 10; // number of times to repeat experiment
+  int REPEATS = 1000; // number of times to repeat experiment
   int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   int MIN_S = 2, MAX_S = 10; // MAX_S < 100
   int reps = 10; // number of times needed my MinR and MinC
@@ -323,7 +323,7 @@ void run_vary_q(point_set_t* P, point_set_t* cskyline, double epsilon, double de
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[6][100];
-  int REPEATS = 10; // number of times to repeat experiment
+  int REPEATS = 100; // number of times to repeat experiment
   int SQUEEZEU = 0, TT = 1 , UHRAND = 2, MIN_D = 3, MIN_R = 4, BREAKPOINT = 5;
   int MIN_Q = 10, MAX_Q = 80; // MAX < 100
   int reps = 10; // number of times needed my MinR and MinC
@@ -400,7 +400,7 @@ void run_fix_totalshown(point_set_t* P, point_set_t* cskyline, double epsilon, d
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[6][100];
-  int REPEATS = 10; // number of times to repeat experiment
+  int REPEATS = 100; // number of times to repeat experiment
   int SQUEEZEU = 0, TT = 1, UHRAND = 2, MIN_D = 3, MIN_R = 4, Breakpoint = 5;
   int MIN_S = 2, MAX_S = 6; // MAX < 100
   int reps = 10; // number of times needed my MinR and MinC
@@ -480,7 +480,7 @@ void run_vary_epsilon(point_set_t* P, point_set_t* cskyline, double epsilon, dou
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[6][100];
-  int REPEATS = 10, reps = 10;
+  int REPEATS = 100, reps = 10;
   int SQUEEZEU = 0, TT = 1, UHRAND = 2, MIN_D = 3, MIN_R = 4, Breakpoint = 5;
   double MIN_E = 0.001, FACTOR_E = 10;
 
@@ -562,7 +562,7 @@ void run_vary_delta(point_set_t* P, point_set_t* cskyline, double epsilon, doubl
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[5][100];
-  int REPEATS = 10, reps = 10;
+  int REPEATS = 100, reps = 10;
   int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   double MIN_DELTA = 0.001, FACTOR_DELTA = 10;
 
@@ -639,7 +639,7 @@ void run_vary_epsilon_delta(point_set_t* P, point_set_t* cskyline, double epsilo
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[5][100];
-  int REPEATS = 10, reps = 10;
+  int REPEATS = 100, reps = 10;
   int SQUEEZEU = 0, UHRAND = 1, MIN_D = 2, MIN_R = 3, Breakpoint = 4;
   double MIN_DELTA = 0.001, FACTOR_DELTA = 10;
   
@@ -717,7 +717,7 @@ void run_false_positives(point_set_t* P, point_set_t* cskyline, double epsilon, 
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, C_size[7];
-  int REPEATS = 10, reps = 10;
+  int REPEATS = 100, reps = 10;
   int SQUEEZEU = 0, TT = 1, UHRAND = 2, MIN_D = 3, MIN_R = 4, Breakpoint = 5, REAL = 6;
   
   for(int i = 0; i < 7; ++i) 
@@ -807,7 +807,7 @@ void run_time(point_set_t* P, point_set_t* cskyline, double epsilon, double delt
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, t[6];
-  int REPEATS = 10, reps = 10;
+  int REPEATS = 100, reps = 10;
   int SQUEEZEU = 0, TT = 1, UHRAND = 2, MIN_D = 3, MIN_R = 4, Breakpoint = 5;
   using namespace std::chrono;
   high_resolution_clock::time_point start, finish;
@@ -951,7 +951,7 @@ void run_vary_n(double epsilon, double delta, int s, int q, bool real, bool fake
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[6][100], t[6][100];
-  int REPEATS = 10, reps = 10;
+  int REPEATS = 100, reps = 10;
   int SQUEEZEU = 0, TT = 1, UHRAND = 2, MIN_D = 3, MIN_R = 4, Breakpoint = 5;
   int MIN_n = 1000, MAX_n = 1000000, FACTOR_n = 10;
   char filename[256];
@@ -1089,7 +1089,7 @@ void run_vary_d(double epsilon, double delta, int s, int q, bool real, bool fake
   int stop_option = EXACT_BOUND;
   int cmp_option;
   double alpha, avg_alpha[6][100], t[6][100];
-  int REPEATS = 10, reps = 10;
+  int REPEATS = 100, reps = 10;
   int SQUEEZEU = 0, TT = 1, UHRAND = 2, MIN_D = 3, MIN_R = 4, Breakpoint = 5;
   int MIN_dim = 2, MAX_dim = 6;
   char filename[256];
@@ -1195,7 +1195,7 @@ void run_vary_d(double epsilon, double delta, int s, int q, bool real, bool fake
 	    }
 	}
 
-      dim *= 1;
+      dim += 1;
       release_point_set(cskyline, false);
       release_point_set(skyline, false);
       release_point_set(P, true);
