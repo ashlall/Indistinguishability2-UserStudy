@@ -36,7 +36,7 @@ REPRODUCIBILITY (Do, Kim, Chai, Lall):
 
 To reproduce the experiments in the paper 'The Power of Two: Simplified User Interaction for the Indistinguishability Query' use the following command line options:
 
-./run E island.txt 0.05 0.0 2 10 B 0; ./run E nba.txt 0.05 0.0 2 20 B 0; ./run E house2.txt 0.05 0.0 2 30 B 0; ./run t island.txt 0.05 0.0 2 10 B 0; ./run t nba.txt 0.05 0.0 2 20 B 0; ./run t house2.txt 0.05 0.0 2 30 B 0; ./run Q island.txt 0.05 0.0 2 10 B 0; ./run Q nba.txt 0.05 0.0 2 20 B 0; ./run Q house2.txt 0.05 0.0 2 30 B 0; ./run d LAM 0.05 0.0 2 10 B 0; ./run n LAM 0.05 0.0 2 9 B 0
+./run T nba.txt 0.05 0.0 2 20 B 0; ./run E island.txt 0.05 0.0 2 10 B 0; ./run E nba.txt 0.05 0.0 2 20 B 0; ./run E house2.txt 0.05 0.0 2 30 B 0; ./run t island.txt 0.05 0.0 2 10 B 0; ./run t nba.txt 0.05 0.0 2 20 B 0; ./run t house2.txt 0.05 0.0 2 30 B 0; ./run Q island.txt 0.05 0.0 2 10 B 0; ./run Q nba.txt 0.05 0.0 2 20 B 0; ./run Q house2.txt 0.05 0.0 2 30 B 0; ./run d LAM 0.05 0.0 2 10 B 0; ./run n LAM 0.05 0.0 2 9 B 0
 
 After running these commands, go to the output folder and type in:
 
