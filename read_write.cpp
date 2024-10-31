@@ -35,10 +35,20 @@ point_set_t* read_points(char* input)
 		point_set->points[i] = p;
 	}
 
+	// here
+	// print out all the max values
+	// first max = 5, then multiply everything in that column by 5
+	// in my code, then for each column i would mulitply by the maximum value for that column
+
+
+	//cout << "THIS IS THE MAX VALUE: " << max << endl;
+
+
 	// normalize the points so that the maximum value in any dimension is exactly 1
 	for (int i = 0; i < number_of_points; i++)
 	  for (int j = 0; j < dim; j++)
-	    point_set->points[i]->coord[j] = point_set->points[i]->coord[j] / max;
+	  	// got rid of dividing by max since we want to show the users real raw values of the dataset.
+	    point_set->points[i]->coord[j] = point_set->points[i]->coord[j]; // / max;
 
 	fclose(c_fp);
 	return point_set;
